@@ -1,5 +1,6 @@
 #include "Door.hpp"
 #include "Config.hpp"
+#include "Assets.hpp"
 
 Door::Door(float x, float y, float width, float height, DoorType type)
 : type(type)
@@ -14,12 +15,12 @@ Door::Door(float x, float y, float width, float height, DoorType type)
     if (type == DoorType::playerOneDoor)
     {
         shape.setFillColor(sf::Color::Red);
-        applyTexture("door_red.png");
+        applyTexture(Assets::Textures::DOOR_PLAYER_ONE);
     }
     else
     {
         shape.setFillColor(sf::Color::Blue);
-        applyTexture("door_blue.png");
+        applyTexture(Assets::Textures::DOOR_PLAYER_TWO);
     }
 }
 

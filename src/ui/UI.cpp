@@ -1,9 +1,11 @@
 #include "UI.hpp"
 #include "SaveManager.hpp"
+#include "Config.hpp"
+#include "Assets.hpp"
 
 UI::UI()
 {
-    font.loadFromFile(std::string(GAME_ASSET_DIR) + "/DEBUGfont.ttf");
+    font.loadFromFile(std::string(GAME_ASSET_DIR) + Assets::Fonts::UI);
 }
 
 void UI::renderMenu(sf::RenderWindow &window, const std::string &title,

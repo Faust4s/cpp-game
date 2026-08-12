@@ -1,4 +1,5 @@
 #include "Gem.hpp"
+#include "Assets.hpp"
 
 Gem::Gem(float x, float y, float width, float height, GemType type)
 : type(type)
@@ -7,9 +8,9 @@ Gem::Gem(float x, float y, float width, float height, GemType type)
     shape.setPosition(x, y);
 
     if (type == GemType::redGem)
-        applyTexture("firegem.png");
+        applyTexture(Assets::Textures::GEM_RED);
     else
-        applyTexture("bluegem.png");
+        applyTexture(Assets::Textures::GEM_BLUE);
 }
 
 GemType Gem::getType()        { return type; }

@@ -14,7 +14,7 @@ void BackgroundManager::setupBackground(const sf::RenderWindow& window)
         static_cast<float>(window.getSize().y)));
     background.setFillColor(sf::Color(45, 45, 45));
 
-    sf::Texture* texture = TextureManager::getInstance().get(Config::BACKGROUND_TEXTURE);
+    sf::Texture* texture = TextureManager::getInstance().get(Assets::Textures::BACKGROUND);
     if (texture)
     {
         background.setTexture(texture);
@@ -34,7 +34,7 @@ void BackgroundManager::setupMenuBackground(const sf::RenderWindow& window)
         static_cast<float>(window.getSize().y)));
     menuBackground.setFillColor(sf::Color(45, 45, 45));
 
-    sf::Texture* texture = TextureManager::getInstance().get(Config::MENU_BACKGROUND_TEXTURE);
+    sf::Texture* texture = TextureManager::getInstance().get(Assets::Textures::MENU_BACKGROUND);
     if (texture)
     {
         menuBackground.setTexture(texture);

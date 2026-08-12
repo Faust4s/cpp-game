@@ -1,10 +1,11 @@
 #include "Game.hpp"
+#include "Assets.hpp"
 #include <fstream>
 
 Game::Game()
     : window(sf::VideoMode(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT), "2D Game", sf::Style::Titlebar | sf::Style::Close),
-      playerOne(120.f, 500.f, sf::Color::Red, "textures/warmsprite.png"),
-      playerTwo(520.f, 500.f, sf::Color::Blue, "textures/coldsprite.png"),
+      playerOne(120.f, 500.f, sf::Color::Red, Assets::Textures::PLAYER_ONE),
+      playerTwo(520.f, 500.f, sf::Color::Blue, Assets::Textures::PLAYER_TWO),
       playerOneInput(sf::Keyboard::A, sf::Keyboard::D, sf::Keyboard::W),
       playerTwoInput(sf::Keyboard::Left, sf::Keyboard::Right, sf::Keyboard::Up),
       bgManager(window)

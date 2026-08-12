@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Config.hpp"
+#include "Assets.hpp"
 #include "TextureManager.hpp"
 #include "GameState.hpp"
 
