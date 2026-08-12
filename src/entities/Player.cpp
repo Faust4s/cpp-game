@@ -94,7 +94,7 @@ void Player::jump()
     }
 }
 
-sf::FloatRect Player::getBounds()
+sf::FloatRect Player::getBounds() const
 {
     return shape.getGlobalBounds();
 }

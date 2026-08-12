@@ -1,13 +1,14 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "Config.hpp"
 
 class SpriteAnimator
 {
 public:
     SpriteAnimator() = default;
 
-    bool load(const std::string& spriteFile);
+    bool load(const std::string& spriteFile, float hitboxSize = Config::PLAYER_HITBOX);
     void update(float dt, float currentX, float previousX);
     void draw(sf::RenderWindow& window);
     void syncPosition(sf::Vector2f position, sf::Vector2f hitboxSize);
@@ -26,5 +27,5 @@ private:
 
     void updateTextureRect(int frame = -1);
     void syncVisualPosition(sf::Vector2f position, sf::Vector2f hitboxSize);
-    void createSpriteSheet(const std::string& spriteFile);
+    void createSpriteSheet(const std::string& spriteFile, float hitboxSize);
 };
