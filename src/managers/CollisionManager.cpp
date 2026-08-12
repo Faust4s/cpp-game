@@ -1,8 +1,73 @@
 #include "CollisionManager.hpp"
+#include "Enemy.hpp"
 
-void CollisionManager::check(Player& player, std::vector<Platform>& platforms, sf::RenderWindow& window)
+void CollisionManager::check(Enemy &enemy, std::vector<Platform> &platforms, sf::RenderWindow &window)
 {
-    for (auto& platform : platforms)
+    for (auto &platform : platforms)
+        resolveCollision(enemy, platform.getBounds());
+
+    sf::FloatRect bounds = enemy.getBounds();
+    if (bounds.left < 0)
+        enemy.setPositionX(0);
+    if (bounds.left + bounds.width > window.getSize().x)
+        enemy.setPositionX(window.getSize().x - bounds.width);
+}
+
+void CollisionManager::resolveCollision(Enemy &enemy, const sf::FloatRect &platformBounds)
+{
+    sf::FloatRect bounds = enemy.getBounds();
+    if (!bounds.intersects(platformBounds))
+        return;
+
+    int entityRightX = bounds.left + bounds.width;
+    int entityBottomY = bounds.top + bounds.height;
+    int platformRightX = platformBounds.left + platformBounds.width;
+    int platformBottomY = platformBounds.top + platformBounds.height;
+
+    int overlapLeft = entityRightX - platformBounds.left;
+    int overlapRight = platformRightX - bounds.left;
+    int overlapTop = entityBottomY - platformBounds.top;
+    int overlapBottom = platformBottomY - bounds.top;
+
+    int minOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
+
+    if (minOverlap == overlapLeft)
+    {
+        enemy.setPositionX(platformBounds.left - bounds.width);
+        enemy.reversePatrolDirection(); // ✅ atsimušė į kairę sieną
+    }
+    else if (minOverlap == overlapRight)
+    {
+        enemy.setPositionX(platformRightX);
+        enemy.reversePatrolDirection(); // ✅ atsimušė į dešinę sieną
+    }
+    else if (minOverlap == overlapTop)
+    {
+        if (enemy.getVelocityY() >= 0.f)
+        {
+            enemy.setPositionY(platformBounds.top - bounds.height);
+            enemy.setVelocityY(0.f);
+            enemy.setOnGround(true);
+        }
+    }
+    else if (minOverlap == overlapBottom)
+    {
+        if (enemy.getVelocityY() < 0.f)
+        {
+            enemy.setPositionY(platformBottomY);
+            enemy.setVelocityY(0.f);
+        }
+    }
+}
+
+bool CollisionManager::checkHazardCollision(Enemy &enemy, Hazard &hazard)
+{
+    return enemy.getBounds().intersects(hazard.getBounds());
+}
+
+void CollisionManager::check(Player &player, std::vector<Platform> &platforms, sf::RenderWindow &window)
+{
+    for (auto &platform : platforms)
         resolveCollision(player, platform.getBounds());
 
     // sienos
@@ -14,20 +79,21 @@ void CollisionManager::check(Player& player, std::vector<Platform>& platforms, s
 }
 
 // AABB minimum overlap method
-void CollisionManager::resolveCollision(Player& player, const sf::FloatRect& platformBounds)
+void CollisionManager::resolveCollision(Player &player, const sf::FloatRect &platformBounds)
 {
     sf::FloatRect playerBounds = player.getBounds();
 
-    if (!playerBounds.intersects(platformBounds)) return;
+    if (!playerBounds.intersects(platformBounds))
+        return;
 
-    int playerRightX    = playerBounds.left + playerBounds.width;
-    int playerBottomY   = playerBounds.top + playerBounds.height;
-    int platformRightX  = platformBounds.left + platformBounds.width;
+    int playerRightX = playerBounds.left + playerBounds.width;
+    int playerBottomY = playerBounds.top + playerBounds.height;
+    int platformRightX = platformBounds.left + platformBounds.width;
     int platformBottomY = platformBounds.top + platformBounds.height;
 
-    int overlapLeft   = playerRightX - platformBounds.left;
-    int overlapRight  = platformRightX - playerBounds.left;
-    int overlapTop    = playerBottomY - platformBounds.top;
+    int overlapLeft = playerRightX - platformBounds.left;
+    int overlapRight = platformRightX - playerBounds.left;
+    int overlapTop = playerBottomY - platformBounds.top;
     int overlapBottom = platformBottomY - playerBounds.top;
 
     int minOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
@@ -43,7 +109,7 @@ void CollisionManager::resolveCollision(Player& player, const sf::FloatRect& pla
         player.setVelocityX(0.f);
     }
     else if (minOverlap == overlapTop)
-    {   
+    {
 
         if (player.getVelocityY() >= 0.f)
         {
@@ -62,22 +128,25 @@ void CollisionManager::resolveCollision(Player& player, const sf::FloatRect& pla
     }
 }
 
-bool CollisionManager::checkHazardCollision(Player& player, Hazard& hazard){
-    
+bool CollisionManager::checkHazardCollision(Player &player, Hazard &hazard)
+{
+
     return player.getBounds().intersects(hazard.getBounds());
 }
 
-bool CollisionManager::checkGemCollision(Player& player, Gem& gem){
-    
+bool CollisionManager::checkGemCollision(Player &player, Gem &gem)
+{
+
     return player.getBounds().intersects(gem.getBounds());
 }
 
-bool CollisionManager::checkDoorCollision(Player& player, Door& door){
-    
+bool CollisionManager::checkDoorCollision(Player &player, Door &door)
+{
+
     return player.getBounds().intersects(door.getBounds());
 }
 
-bool CollisionManager::checkButtonCollision(Player& player, Button& button)
+bool CollisionManager::checkButtonCollision(Player &player, Button &button)
 {
     return player.getBounds().intersects(button.getBounds());
 }

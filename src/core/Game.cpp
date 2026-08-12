@@ -163,7 +163,7 @@ void Game::handlePausedInput(sf::Keyboard::Key key)
 }
 
 void Game::handleWinInput(sf::Keyboard::Key key)
-{   
+{
 
     if (currentLevel + 1 >= unlockedLevels && unlockedLevels < Config::LEVEL_COUNT)
     {
@@ -233,7 +233,10 @@ void Game::update()
 
     if (updateHazards())
         return;
+    if (checkEnemyCollisions())
+        return;
 
+    updateEnemies(dt);
     updateGems();
     updateDoors(dt);
 
@@ -385,6 +388,8 @@ void Game::render()
             d.draw(window);
         for (auto &b : buttons)
             b.draw(window);
+        for (auto &e : enemies)
+            e.draw(window);
 
         playerTwo.draw(window);
         playerOne.draw(window);
@@ -429,6 +434,63 @@ void Game::updatePlayer(Player &player, const InputHandler &inputHandler, float 
         player.jump();
 }
 
+void Game::updateEnemies(float dt)
+{
+    for (auto &e : enemies)
+    {
+        if (!e.isAlive())
+            continue;
+        e.update(dt, players);
+        e.applyGravity(dt);
+        collision.check(e, platforms, window);
+
+        // iškrito iš ekrano
+        if (e.getBounds().top > window.getSize().y)
+            e.kill();
+    }
+}
+
+bool Game::checkEnemyCollisions()
+{
+    for (auto &e : enemies)
+    {
+        if (!e.isAlive())
+            continue;
+
+        // hazard nužudo enemy
+        for (auto &h : hazards)
+            if (collision.checkHazardCollision(e, h))
+                e.kill();
+
+        // žaidėjas užšoka ant enemy iš viršaus
+        for (auto *p : players)
+        {
+            sf::FloatRect pBounds = p->getBounds();
+            sf::FloatRect eBounds = e.getBounds();
+
+            if (pBounds.intersects(eBounds))
+            {
+                float playerBottom = pBounds.top + pBounds.height;
+                float enemyTop = eBounds.top;
+
+                if (playerBottom <= enemyTop + 10.f && p->getVelocityY() > 0.f)
+                {
+                    e.kill(); // žaidėjas nušoka ant enemy
+                }
+                else
+                {
+                    // enemy liečia žaidėją iš šono – žaidėjas miršta
+                    gameState = GameState::Lose;
+                    sounds.stopMusic();
+                    sounds.playDeathMusic();
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 void Game::loadLevel(int levelIndex)
 {
     currentLevel = levelIndex;
@@ -446,6 +508,7 @@ void Game::loadMap(const std::string &name)
     doors.clear();
     gems.clear();
     buttons.clear();
+    enemies.clear();
 
     std::ifstream in(std::string(GAME_ASSET_DIR) + "/" + name);
     if (!in)
@@ -496,6 +559,13 @@ void Game::loadMap(const std::string &name)
                 playerTwo.setSpawnPoint(
                     x + (tile - playerTwo.getBounds().width) * 0.5f,
                     y + tile - playerTwo.getBounds().height);
+                break;
+            case 'A':
+                enemies.emplace_back(
+                    x + (tile - Config::ENEMY_HITBOX * Config::ENEMY_HITBOX_WIDTH_SCALE) * 0.5f,
+                    y + tile - Config::ENEMY_HITBOX * Config::ENEMY_HITBOX_HEIGHT_SCALE,
+                    sf::Color::Green,
+                    Assets::Textures::ENEMY);
                 break;
             case 'R':
                 gems.emplace_back(x, y, tile, tile, GemType::redGem);

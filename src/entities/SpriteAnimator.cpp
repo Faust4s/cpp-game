@@ -2,15 +2,15 @@
 #include "Config.hpp"
 #include <cmath>
 
-bool SpriteAnimator::load(const std::string &spriteFile)
+bool SpriteAnimator::load(const std::string &spriteFile, float hitboxSize)
 {
     if (spriteFile.empty())
         return false;
-    createSpriteSheet(spriteFile);
+    createSpriteSheet(spriteFile, hitboxSize);
     return hasSprite;
 }
 
-void SpriteAnimator::createSpriteSheet(const std::string &spriteFile)
+void SpriteAnimator::createSpriteSheet(const std::string& spriteFile, float hitboxSize)
 {
     const std::string spritePath = std::string(GAME_ASSET_DIR) + "/" + spriteFile;
     if (!spriteSheet.loadFromFile(spritePath))
@@ -21,8 +21,8 @@ void SpriteAnimator::createSpriteSheet(const std::string &spriteFile)
     hasSprite = true;
     sprite.setTexture(spriteSheet);
     sprite.setScale(
-        (Config::PLAYER_HITBOX * Config::SPRITE_VISUAL_SCALE) / static_cast<float>(Config::SPRITE_FRAME_SIZE),
-        (Config::PLAYER_HITBOX * Config::SPRITE_VISUAL_SCALE) / static_cast<float>(Config::SPRITE_FRAME_SIZE));
+        (hitboxSize * Config::SPRITE_VISUAL_SCALE) / static_cast<float>(Config::SPRITE_FRAME_SIZE),
+        (hitboxSize * Config::SPRITE_VISUAL_SCALE) / static_cast<float>(Config::SPRITE_FRAME_SIZE));
     updateTextureRect(Config::SPRITE_IDLE_FRAME);
 }
 

@@ -42,7 +42,7 @@ public:
     void applyGravity(float dt);
     bool isOnGround(const sf::RectangleShape& ground);
     void stopFalling(const sf::RectangleShape& ground);
-    sf::FloatRect getBounds();
+    sf::FloatRect getBounds() const;
     float getVelocityY() const;
 
     // setters
@@ -61,7 +61,7 @@ private:
     float velocityX = 0.f;
     float speed    = Config::PLAYER_SPEED;
     float gravity  = Config::PLAYER_GRAVITY;
-    float previousX = 0.f;
+    float previousX = 0.f; // used in SpriteAnimator::update()
     bool onGround = false;
 
     sf::RectangleShape shape;
