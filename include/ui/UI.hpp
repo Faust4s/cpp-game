@@ -14,7 +14,9 @@ enum class MenuAction
     Continue,
     Back,
     Instructions,
-    Credits
+    Credits,
+    Settings,
+    ToggleMusic
 };
 
 class UI
@@ -29,6 +31,7 @@ public:
     void renderInstructions(sf::RenderWindow& window);
     void renderLevelSelect(sf::RenderWindow& window, int levelCount, int unlockedLevels);
     void renderCredits(sf::RenderWindow& window);
+    void renderSettings(sf::RenderWindow& window, bool musicMuted);
 
     MenuAction handleMainMenu(sf::Keyboard::Key key);
     MenuAction handlePauseMenu(sf::Keyboard::Key key);
@@ -37,6 +40,7 @@ public:
     MenuAction handleLevelSelect(sf::Keyboard::Key key, int levelCount, int unlockedLevels);
     MenuAction handleInstructions(sf::Keyboard::Key key);
     MenuAction handleCredits(sf::Keyboard::Key key);
+    MenuAction handleSettings(sf::Keyboard::Key key);
 
     void resetIndex();
     int getSelectedLevel() const { return selectedIndex; }

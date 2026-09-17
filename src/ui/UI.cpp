@@ -37,7 +37,7 @@ void UI::renderMainMenu(sf::RenderWindow &window)
 
 void UI::renderPauseMenu(sf::RenderWindow &window)
 {
-    renderMenu(window, "Paused", {"Resume", "Restart", "Back to Levels", "Exit Game"});
+    renderMenu(window, "Paused", {"Resume", "Restart", "Back to Levels", "Settings", "Exit Game"});
 }
 
 void UI::renderWinScreen(sf::RenderWindow &window, int p1Gems, int p2Gems)
@@ -175,6 +175,41 @@ void UI::renderCredits(sf::RenderWindow &window)
              isOkSelected ? sf::Color::Yellow : sf::Color::White);
 }
 
+void UI::renderSettings(sf::RenderWindow &window, bool musicMuted)
+{
+    sf::RectangleShape panel(sf::Vector2f(500.f, 300.f));
+    panel.setFillColor(sf::Color(20, 20, 20, 230));
+    panel.setOutlineColor(sf::Color::White);
+    panel.setOutlineThickness(2.f);
+    panel.setPosition(134.f, 140.f);
+    window.draw(panel);
+
+    drawText(window, "Settings", 300.f, 160.f, 36, sf::Color::Yellow);
+
+    std::string musicLabel = "Music: " + std::string(musicMuted ? "OFF" : "ON");
+    bool isMusicSelected = (selectedIndex == 0);
+    drawText(window, isMusicSelected ? "> " + musicLabel : musicLabel,
+             200.f, 250.f, 28, isMusicSelected ? sf::Color::Yellow : sf::Color::White);
+
+    bool isBackSelected = (selectedIndex == 1);
+    drawText(window, isBackSelected ? "> Back" : "Back",
+             300.f, 320.f, 28, isBackSelected ? sf::Color::Yellow : sf::Color::White);
+}
+
+MenuAction UI::handleSettings(sf::Keyboard::Key key)
+{
+    if (key == sf::Keyboard::Up || key == sf::Keyboard::Down)
+        selectedIndex = (selectedIndex + 1) % 2;
+    if (key == sf::Keyboard::Return)
+    {
+        if (selectedIndex == 0)
+            return MenuAction::ToggleMusic;
+        if (selectedIndex == 1)
+            return MenuAction::Back;
+    }
+    return MenuAction::None;
+}
+
 MenuAction UI::handleInstructions(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Return)
@@ -212,19 +247,16 @@ MenuAction UI::handleMainMenu(sf::Keyboard::Key key)
 MenuAction UI::handlePauseMenu(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Up)
-        selectedIndex = (selectedIndex - 1 + 4) % 4;
+        selectedIndex = (selectedIndex - 1 + 5) % 5;
     if (key == sf::Keyboard::Down)
-        selectedIndex = (selectedIndex + 1) % 4;
+        selectedIndex = (selectedIndex + 1) % 5;
     if (key == sf::Keyboard::Return)
     {
-        if (selectedIndex == 0)
-            return MenuAction::Resume;
-        if (selectedIndex == 1)
-            return MenuAction::Restart;
-        if (selectedIndex == 2)
-            return MenuAction::BackToLevels;
-        if (selectedIndex == 3)
-            return MenuAction::Exit;
+        if (selectedIndex == 0) return MenuAction::Resume;
+        if (selectedIndex == 1) return MenuAction::Restart;
+        if (selectedIndex == 2) return MenuAction::BackToLevels;
+        if (selectedIndex == 3) return MenuAction::Settings;
+        if (selectedIndex == 4) return MenuAction::Exit;
     }
     return MenuAction::None;
 }

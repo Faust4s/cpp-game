@@ -32,8 +32,23 @@ namespace Assets
         constexpr char TILE[] = "tile.png";
     }
 
+    namespace Sounds
+    {
+    constexpr char GEM[] = "/sounds/gem_sound.wav";
+    constexpr char WIN[] = "/sounds/win_sound.wav";
+    constexpr char MENU_MUSIC[] = "/sounds/menu_music.wav";
+    constexpr char GAME_MUSIC[] = "/sounds/background_music.ogg";
+    constexpr char LOSE_MUSIC[] = "/sounds/lose_music.wav";
+    }
+
     namespace Fonts
     {
         constexpr char UI[] = "/font.ttf";
+    }
+
+    namespace SaveFiles
+    {
+    constexpr char SAVE[] = "save.dat";
+    constexpr char SETTINGS[] = "settings.dat";
     }
 }

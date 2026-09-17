@@ -59,6 +59,9 @@ void Game::processEvents()
             case GameState::MainMenu:
                 handleMainMenuInput(event.key.code);
                 break;
+            case GameState::Settings:
+                handleSettingsInput(event.key.code);
+                break;
             case GameState::Instructions:
                 handleInstructionsInput(event.key.code);
                 break;
@@ -176,6 +179,11 @@ void Game::handlePausedInput(sf::Keyboard::Key key)
         sounds.playMenuMusic();
         ui.resetIndex();
     }
+    if (action == MenuAction::Settings)
+    {
+        gameState = GameState::Settings;
+        ui.resetIndex();
+    }
     if (action == MenuAction::Exit)
         window.close();
 }
@@ -228,6 +236,20 @@ void Game::handleLoseInput(sf::Keyboard::Key key)
     }
     if (action == MenuAction::Exit)
         window.close();
+}
+
+void Game::handleSettingsInput(sf::Keyboard::Key key)
+{
+    MenuAction action = ui.handleSettings(key);
+    if (action == MenuAction::ToggleMusic)
+    {
+        sounds.toggleMusicMuted();
+    }
+    if (action == MenuAction::Back)
+    {
+        gameState = GameState::Paused;
+        ui.resetIndex();
+    }
 }
 
 void Game::restart()
@@ -412,6 +434,8 @@ void Game::render()
             ui.renderGemCounter(window, playerOne.getGemCount(), playerTwo.getGemCount());
         else if (gameState == GameState::Paused)
             ui.renderPauseMenu(window);
+        else if (gameState == GameState::Settings)
+            ui.renderSettings(window, sounds.isMusicMuted());
         else if (gameState == GameState::Win)
             ui.renderWinScreen(window, playerOne.getGemCount(), playerTwo.getGemCount());
         else if (gameState == GameState::Lose)

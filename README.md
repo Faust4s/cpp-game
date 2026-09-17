@@ -52,3 +52,4 @@ make run
 
 - forward declaration class player/include
 
+SAVE FAILA IKELTI I CONFIG, MUSIC GARSUS IKELTI I KONFIG (REGULIAVIMA) 

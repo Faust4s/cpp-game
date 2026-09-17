@@ -1,7 +1,8 @@
 #include "SaveManager.hpp"
+#include "Assets.hpp"
 #include <fstream>
 
-static const std::string SAVE_FILE = "save.dat";
+static const std::string SAVE_FILE = Assets::SaveFiles::SAVE;
 
 void SaveManager::save(int unlockedLevels)
 {

@@ -46,8 +46,9 @@ namespace Config
     // Button
     constexpr float BUTTON_SCALE = 2.f;
 
-    // Music
-    /* TODO! */
-
+    // Audio
+    constexpr float MUSIC_VOLUME = 20.f;
+    constexpr float GEM_SOUND_VOLUME = 30.f;
+    constexpr float WIN_SOUND_VOLUME = 20.f;
 
 }
