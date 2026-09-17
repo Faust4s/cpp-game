@@ -14,7 +14,6 @@ namespace Assets
 
         constexpr char PLAYER_ONE[] = "textures/warmsprite.png";
         constexpr char PLAYER_TWO[] = "textures/coldsprite.png";
-        constexpr char ENEMY[] = "textures/warmsprite.png"; // TODO: give the enemy its own sprite
 
         constexpr char BUTTON_PRESSED[] = "button_pressed.png";
         constexpr char BUTTON_UNPRESSED[] = "button_unpressed.png";

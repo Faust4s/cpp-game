@@ -38,11 +38,13 @@ public:
     void resetIndex();
     int getSelectedLevel() const { return selectedIndex; }
 
+    void setSelectedIndex(int index);
 
 private:
     sf::Font font;
 
     int selectedIndex = 0; // choice
+
 
     void renderMenu(sf::RenderWindow &window, const std::string &title,
                     const std::vector<std::string> &items);

@@ -260,6 +260,8 @@ MenuAction UI::handleLevelSelect(sf::Keyboard::Key key, int levelCount, int unlo
     return MenuAction::None;
 }
 
+void UI::setSelectedIndex(int index) { selectedIndex = index; }
+
 void UI::drawText(sf::RenderWindow &window, const std::string &str, float x, float y, unsigned int size, sf::Color color)
 {
     sf::Text text;

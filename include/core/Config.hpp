@@ -24,17 +24,6 @@ namespace Config
     constexpr float PLAYER_HITBOX_WIDTH_SCALE = 0.6f;
     constexpr float PLAYER_HITBOX_HEIGHT_SCALE = 0.9f;
 
-    // Enemy
-    constexpr float ENEMY_SPEED = 80.f;
-    constexpr float ENEMY_JUMP = -300.f;
-    constexpr float ENEMY_DETECTION = 200.f; // pixels
-    constexpr float ENEMY_GRAVITY = 1500.f;
-
-    // Enemy hitbox
-    constexpr float ENEMY_HITBOX = 50.f;
-    constexpr float ENEMY_HITBOX_WIDTH_SCALE = 0.6f;
-    constexpr float ENEMY_HITBOX_HEIGHT_SCALE = 0.9f;
-
     // Platform
     constexpr float PLATFORM_SPEED = 60.f;
     constexpr float PLATFORM_MOVE_RANGE = 50.f;
@@ -45,7 +34,7 @@ namespace Config
     // Levels
     constexpr int LEVEL_COUNT = 6;
 
-    // Delta time
+    // Delta time (for frames)
     constexpr float MAX_DT = 0.05f;
 
     // Time of door opening

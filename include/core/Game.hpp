@@ -15,7 +15,6 @@
 #include "GameState.hpp"
 #include "Button.hpp"
 #include "SaveManager.hpp"
-#include "Enemy.hpp"
 
 class Game 
 {
@@ -50,7 +49,6 @@ private:
     void updateButtons();
 
     void updateEnemies(float dt);
-    bool checkEnemyCollisions();
 
     // other
     void render();
@@ -69,7 +67,6 @@ private:
     Player playerOne;
     Player playerTwo;
     std::vector<Player*> players;
-    std::vector<Enemy> enemies;
     InputHandler playerOneInput;
     InputHandler playerTwoInput;
 
