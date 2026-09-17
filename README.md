@@ -51,5 +51,3 @@ make run
 - Add best time, gems collected (save to file)
 
 - forward declaration class player/include
-
-SAVE FAILA IKELTI I CONFIG, MUSIC GARSUS IKELTI I KONFIG (REGULIAVIMA) 
