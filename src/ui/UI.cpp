@@ -32,7 +32,7 @@ void UI::renderMenu(sf::RenderWindow &window, const std::string &title,
 
 void UI::renderMainMenu(sf::RenderWindow &window)
 {
-    renderMenu(window, "2D Game", {"Play", "Instructions", "Exit"});
+    renderMenu(window, "2D Game", {"Play", "Instructions", "Credits", "Exit"});
 }
 
 void UI::renderPauseMenu(sf::RenderWindow &window)
@@ -151,7 +151,38 @@ void UI::renderInstructions(sf::RenderWindow &window)
              isOkSelected ? sf::Color::Yellow : sf::Color::White);
 }
 
+void UI::renderCredits(sf::RenderWindow &window)
+{
+    sf::RectangleShape panel(sf::Vector2f(500.f, 400.f));
+    panel.setFillColor(sf::Color(20, 20, 20, 230));
+    panel.setOutlineColor(sf::Color::White);
+    panel.setOutlineThickness(2.f);
+    panel.setPosition(134.f, 100.f);
+    window.draw(panel);
+
+    drawText(window, "Credits", 300.f, 120.f, 36, sf::Color::Yellow);
+
+    std::string credits =
+        "Game Design & Programming:\n"
+        "  - Faustas Alekna\n"
+        "  - Gustas Juskevicius\n\n"
+        "Made with C++ / SFML";
+
+    drawText(window, credits, 160.f, 200.f, 20, sf::Color::White);
+
+    bool isOkSelected = (selectedIndex == 0);
+    drawText(window, isOkSelected ? "> OK" : "OK", 370.f, 450.f, 24,
+             isOkSelected ? sf::Color::Yellow : sf::Color::White);
+}
+
 MenuAction UI::handleInstructions(sf::Keyboard::Key key)
+{
+    if (key == sf::Keyboard::Return)
+        return MenuAction::Back;
+    return MenuAction::None;
+}
+
+MenuAction UI::handleCredits(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Return)
         return MenuAction::Back;
@@ -161,9 +192,9 @@ MenuAction UI::handleInstructions(sf::Keyboard::Key key)
 MenuAction UI::handleMainMenu(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Up)
-        selectedIndex = (selectedIndex - 1 + 3) % 3;
+        selectedIndex = (selectedIndex - 1 + 4) % 4;
     if (key == sf::Keyboard::Down)
-        selectedIndex = (selectedIndex + 1) % 3;
+        selectedIndex = (selectedIndex + 1) % 4;
     if (key == sf::Keyboard::Return)
     {
         if (selectedIndex == 0)
@@ -171,6 +202,8 @@ MenuAction UI::handleMainMenu(sf::Keyboard::Key key)
         if (selectedIndex == 1)
             return MenuAction::Instructions;
         if (selectedIndex == 2)
+            return MenuAction::Credits;
+        if (selectedIndex == 3)
             return MenuAction::Exit;
     }
     return MenuAction::None;

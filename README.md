@@ -42,11 +42,10 @@ make run
 
 ### TODO
 
-- Level system -> make a hierarchy if level one is not finished levels 1 and 2 ... are not available ✅
-- Create a button which would control the platform ✅
-- In main menu add an instruction tab that would explain how the game works ✅
 - Add door opening door texture (effect)
+- Perėjimo (fade) efektai tarp state'ų (dabar tikriausiai staigus perjungimas)
 - Death effects
+- Gem counter animacija surinkus gemą
 - Change the background ✅
 - fix bugs, polish collision system, build game?
 - Add best time, gems collected (save to file)

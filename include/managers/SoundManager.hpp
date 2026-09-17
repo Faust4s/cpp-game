@@ -20,7 +20,13 @@ public:
 
     void stopAllSounds();
 
+    // Option to mute the sound
+    void toggleMusicMuted();
+    bool isMusicMuted() const { return musicMuted; }
+
 private:
+    bool musicMuted = false;
+
     sf::Music music;
 
     sf::SoundBuffer gemBuffer;

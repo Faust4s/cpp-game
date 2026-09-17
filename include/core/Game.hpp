@@ -36,6 +36,7 @@ private:
     void handlePausedInput(sf::Keyboard::Key key);
     void handleWinInput(sf::Keyboard::Key key);
     void handleLoseInput(sf::Keyboard::Key key);
+    void handleCreditsInput(sf::Keyboard::Key key);
     void processEvents();
     
     // update

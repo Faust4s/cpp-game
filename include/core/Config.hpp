@@ -46,4 +46,8 @@ namespace Config
     // Button
     constexpr float BUTTON_SCALE = 2.f;
 
+    // Music
+    /* TODO! */
+
+
 }

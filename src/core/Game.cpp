@@ -62,6 +62,9 @@ void Game::processEvents()
             case GameState::Instructions:
                 handleInstructionsInput(event.key.code);
                 break;
+            case GameState::Credits:
+                handleCreditsInput(event.key.code);
+                break;
             case GameState::LevelSelect:
                 handleLevelSelectInput(event.key.code);
                 break;
@@ -95,8 +98,23 @@ void Game::handleMainMenuInput(sf::Keyboard::Key key)
         gameState = GameState::Instructions;
         ui.resetIndex();
     }
+    if (action == MenuAction::Credits)
+    {
+        gameState = GameState::Credits;
+        ui.resetIndex();
+    }
     if (action == MenuAction::Exit)
         window.close();
+}
+
+void Game::handleCreditsInput(sf::Keyboard::Key key)
+{
+    MenuAction action = ui.handleCredits(key);
+    if (action == MenuAction::Back)
+    {
+        gameState = GameState::MainMenu;
+        ui.resetIndex();
+    }
 }
 
 void Game::handleInstructionsInput(sf::Keyboard::Key key)
@@ -372,7 +390,8 @@ void Game::render()
 
     bgManager.draw(window, gameState);
 
-    if (gameState != GameState::MainMenu && gameState != GameState::LevelSelect && gameState != GameState::Instructions)
+    if (gameState != GameState::MainMenu && gameState != GameState::LevelSelect &&
+        gameState != GameState::Instructions && gameState != GameState::Credits)
     {
         for (auto &platform : platforms)
             platform.draw(window);
@@ -406,6 +425,8 @@ void Game::render()
             ui.renderInstructions(window);
         else if (gameState == GameState::LevelSelect)
             ui.renderLevelSelect(window, Config::LEVEL_COUNT, unlockedLevels);
+        else if (gameState == GameState::Credits)
+            ui.renderCredits(window);
     }
 
     window.display();

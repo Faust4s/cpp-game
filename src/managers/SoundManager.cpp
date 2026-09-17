@@ -57,6 +57,12 @@ void SoundManager::stopAllSounds()
     winSound.stop();
 }
 
+// void SoundManager::toggleMusicMuted()
+// {
+//     musicMuted = !musicMuted;
+//     music.setVolume(musicMuted ? 0.f : 20.f);
+// }
+
 void SoundManager::stopMusic()                  { music.stop(); }
 void SoundManager::setMusicVolume(float volume) { music.setVolume(volume); }
 

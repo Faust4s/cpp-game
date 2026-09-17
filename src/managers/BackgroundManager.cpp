@@ -48,7 +48,8 @@ void BackgroundManager::setupMenuBackground(const sf::RenderWindow& window)
 
 void BackgroundManager::draw(sf::RenderWindow& window, GameState state)
 {
-    if (state == GameState::MainMenu || state == GameState::LevelSelect)
+    if (state == GameState::MainMenu || state == GameState::LevelSelect ||
+        state == GameState::Credits || state == GameState::Instructions)
         window.draw(menuBackground);
     else
         window.draw(background);
