@@ -7,7 +7,7 @@
 
 SoundManager::SoundManager()
 {
-    musicMuted = SettingsManager::load();
+    SettingsManager::load(musicMuted, soundMuted);
 
     if (gemBuffer.loadFromFile(std::string(GAME_ASSET_DIR) + Assets::Sounds::GEM))
     {
@@ -66,11 +66,26 @@ void SoundManager::toggleMusicMuted()
 {
     musicMuted = !musicMuted;
     music.setVolume(musicMuted ? 0.f : Config::MUSIC_VOLUME);
-    SettingsManager::save(musicMuted);
+    SettingsManager::save(musicMuted, soundMuted);
+}
+
+void SoundManager::toggleSoundMuted()
+{
+    soundMuted = !soundMuted;
+    SettingsManager::save(musicMuted, soundMuted);
 }
 
 void SoundManager::stopMusic()                  { music.stop(); }
 void SoundManager::setMusicVolume(float volume) { music.setVolume(volume); }
 
-void SoundManager::playGemCollect()             { gemSound.play(); }
-void SoundManager::playWin()                    { winSound.play(); }
+void SoundManager::playGemCollect()
+{
+    if (!soundMuted)
+        gemSound.play();
+}
+
+void SoundManager::playWin()
+{
+    if (!soundMuted)
+        winSound.play();
+}

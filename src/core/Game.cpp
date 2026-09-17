@@ -242,9 +242,9 @@ void Game::handleSettingsInput(sf::Keyboard::Key key)
 {
     MenuAction action = ui.handleSettings(key);
     if (action == MenuAction::ToggleMusic)
-    {
         sounds.toggleMusicMuted();
-    }
+    if (action == MenuAction::ToggleSound)
+        sounds.toggleSoundMuted();
     if (action == MenuAction::Back)
     {
         gameState = GameState::Paused;
@@ -435,7 +435,7 @@ void Game::render()
         else if (gameState == GameState::Paused)
             ui.renderPauseMenu(window);
         else if (gameState == GameState::Settings)
-            ui.renderSettings(window, sounds.isMusicMuted());
+            ui.renderSettings(window, sounds.isMusicMuted(), sounds.isSoundMuted());
         else if (gameState == GameState::Win)
             ui.renderWinScreen(window, playerOne.getGemCount(), playerTwo.getGemCount());
         else if (gameState == GameState::Lose)

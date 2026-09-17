@@ -175,7 +175,7 @@ void UI::renderCredits(sf::RenderWindow &window)
              isOkSelected ? sf::Color::Yellow : sf::Color::White);
 }
 
-void UI::renderSettings(sf::RenderWindow &window, bool musicMuted)
+void UI::renderSettings(sf::RenderWindow &window, bool musicMuted, bool soundMuted)
 {
     sf::RectangleShape panel(sf::Vector2f(500.f, 300.f));
     panel.setFillColor(sf::Color(20, 20, 20, 230));
@@ -189,23 +189,29 @@ void UI::renderSettings(sf::RenderWindow &window, bool musicMuted)
     std::string musicLabel = "Music: " + std::string(musicMuted ? "OFF" : "ON");
     bool isMusicSelected = (selectedIndex == 0);
     drawText(window, isMusicSelected ? "> " + musicLabel : musicLabel,
-             200.f, 250.f, 28, isMusicSelected ? sf::Color::Yellow : sf::Color::White);
+             200.f, 230.f, 28, isMusicSelected ? sf::Color::Yellow : sf::Color::White);
 
-    bool isBackSelected = (selectedIndex == 1);
+    std::string soundLabel = "Sound: " + std::string(soundMuted ? "OFF" : "ON");
+    bool isSoundSelected = (selectedIndex == 1);
+    drawText(window, isSoundSelected ? "> " + soundLabel : soundLabel,
+             200.f, 280.f, 28, isSoundSelected ? sf::Color::Yellow : sf::Color::White);
+
+    bool isBackSelected = (selectedIndex == 2);
     drawText(window, isBackSelected ? "> Back" : "Back",
-             300.f, 320.f, 28, isBackSelected ? sf::Color::Yellow : sf::Color::White);
+             300.f, 340.f, 28, isBackSelected ? sf::Color::Yellow : sf::Color::White);
 }
 
 MenuAction UI::handleSettings(sf::Keyboard::Key key)
 {
-    if (key == sf::Keyboard::Up || key == sf::Keyboard::Down)
-        selectedIndex = (selectedIndex + 1) % 2;
+    if (key == sf::Keyboard::Up)
+        selectedIndex = (selectedIndex - 1 + 3) % 3;
+    if (key == sf::Keyboard::Down)
+        selectedIndex = (selectedIndex + 1) % 3;
     if (key == sf::Keyboard::Return)
     {
-        if (selectedIndex == 0)
-            return MenuAction::ToggleMusic;
-        if (selectedIndex == 1)
-            return MenuAction::Back;
+        if (selectedIndex == 0) return MenuAction::ToggleMusic;
+        if (selectedIndex == 1) return MenuAction::ToggleSound;
+        if (selectedIndex == 2) return MenuAction::Back;
     }
     return MenuAction::None;
 }

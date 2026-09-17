@@ -16,7 +16,8 @@ enum class MenuAction
     Instructions,
     Credits,
     Settings,
-    ToggleMusic
+    ToggleMusic,
+    ToggleSound
 };
 
 class UI
@@ -31,7 +32,7 @@ public:
     void renderInstructions(sf::RenderWindow& window);
     void renderLevelSelect(sf::RenderWindow& window, int levelCount, int unlockedLevels);
     void renderCredits(sf::RenderWindow& window);
-    void renderSettings(sf::RenderWindow& window, bool musicMuted);
+    void renderSettings(sf::RenderWindow& window, bool musicMuted, bool soundMuted);
 
     MenuAction handleMainMenu(sf::Keyboard::Key key);
     MenuAction handlePauseMenu(sf::Keyboard::Key key);
