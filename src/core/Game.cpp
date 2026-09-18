@@ -93,17 +93,17 @@ void Game::handleMainMenuInput(sf::Keyboard::Key key)
     MenuAction action = ui.handleMainMenu(key);
     if (action == MenuAction::Play)
     {
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         ui.resetIndex();
     }
     if (action == MenuAction::Instructions)
     {
-        gameState = GameState::Instructions;
+        changeStateWithFade(GameState::Instructions);
         ui.resetIndex();
     }
     if (action == MenuAction::Credits)
     {
-        gameState = GameState::Credits;
+        changeStateWithFade(GameState::Credits);
         ui.resetIndex();
     }
     if (action == MenuAction::Exit)
@@ -115,7 +115,7 @@ void Game::handleCreditsInput(sf::Keyboard::Key key)
     MenuAction action = ui.handleCredits(key);
     if (action == MenuAction::Back)
     {
-        gameState = GameState::MainMenu;
+        changeStateWithFade(GameState::MainMenu);
         ui.resetIndex();
     }
 }
@@ -125,7 +125,7 @@ void Game::handleInstructionsInput(sf::Keyboard::Key key)
     MenuAction action = ui.handleInstructions(key);
     if (action == MenuAction::Back)
     {
-        gameState = GameState::MainMenu;
+        changeStateWithFade(GameState::MainMenu);
         ui.resetIndex();
     }
 }
@@ -136,14 +136,14 @@ void Game::handleLevelSelectInput(sf::Keyboard::Key key)
     if (action == MenuAction::LevelChosen)
     {
         loadLevel(ui.getSelectedLevel());
-        gameState = GameState::Playing;
+        changeStateWithFade(GameState::Playing);
         sounds.stopAllSounds();
         sounds.playGameMusic();
         ui.resetIndex();
     }
     if (action == MenuAction::Back)
     {
-        gameState = GameState::MainMenu;
+        changeStateWithFade(GameState::MainMenu);
         ui.resetIndex();
     }
 }
@@ -175,7 +175,7 @@ void Game::handlePausedInput(sf::Keyboard::Key key)
     if (action == MenuAction::BackToLevels)
     {
         sounds.stopAllSounds();
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         sounds.playMenuMusic();
         ui.resetIndex();
     }
@@ -202,7 +202,7 @@ void Game::handleWinInput(sf::Keyboard::Key key)
     if (action == MenuAction::Continue)
     {
         sounds.stopAllSounds();
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         sounds.playMenuMusic();
         ui.setSelectedIndex(currentLevel);
     }
@@ -230,7 +230,7 @@ void Game::handleLoseInput(sf::Keyboard::Key key)
     if (action == MenuAction::BackToLevels)
     {
         sounds.stopAllSounds();
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         sounds.playMenuMusic();
         ui.resetIndex();
     }
@@ -260,12 +260,14 @@ void Game::restart()
 
 void Game::update()
 {
-    if (gameState != GameState::Playing)
-        return;
-
     float dt = clock.restart().asSeconds();
     if (dt > Config::MAX_DT)
         dt = Config::MAX_DT;
+
+    updateFade(dt);
+
+    if (gameState != GameState::Playing)
+        return;
 
     updatePlatforms(dt);
     updateButtons();
@@ -452,8 +454,39 @@ void Game::render()
         else if (gameState == GameState::Credits)
             ui.renderCredits(window);
     }
+    sf::RectangleShape fadeOverlay(sf::Vector2f(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT));
+    fadeOverlay.setFillColor(sf::Color(0, 0, 0, static_cast<sf::Uint8>(fadeAlpha)));
+    window.draw(fadeOverlay);
 
     window.display();
+}
+
+void Game::changeStateWithFade(GameState newState)
+{
+    pendingState = newState;
+    fadingOut = true;
+}
+
+void Game::updateFade(float dt)
+{
+    float speed = 1800.f;
+
+    if (fadingOut)
+    {
+        fadeAlpha += speed * dt;
+        if (fadeAlpha >= 255.f)
+        {
+            fadeAlpha = 255.f;
+            gameState = pendingState;
+            fadingOut = false;
+        }
+    }
+    else if (fadeAlpha > 0.f)
+    {
+        fadeAlpha -= speed * dt;
+        if (fadeAlpha < 0.f)
+            fadeAlpha = 0.f;
+    }
 }
 
 bool Game::allGemsCollected()

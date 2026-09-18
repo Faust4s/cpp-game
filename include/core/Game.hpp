@@ -58,6 +58,15 @@ private:
     bool allGemsCollected();
     void loadMap(const std::string& filename);
 
+    // transition
+    float fadeAlpha = 0.f;
+    bool fadingOut = false;
+    GameState pendingState;
+
+    void changeStateWithFade(GameState newState);
+    void updateFade(float dt);
+
+
     // window & state
     sf::RenderWindow window;
     sf::Clock clock;

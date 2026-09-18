@@ -48,6 +48,4 @@ make run
 - Gem counter animacija surinkus gemą
 - Change the background ✅
 - fix bugs, polish collision system, build game?
-- Add best time, gems collected (save to file)
-
 - forward declaration class player/include
