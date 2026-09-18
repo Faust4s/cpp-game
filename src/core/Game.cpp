@@ -30,7 +30,6 @@ Game::Game()
     playerOne.addAllowed(DoorType::playerOneDoor);
     playerTwo.addAllowed(DoorType::playerTwoDoor);
 
-    loadMap("map.txt");
 }
 
 // Game loop
@@ -540,14 +539,12 @@ void Game::loadMap(const std::string &name)
     if (rows.empty())
         return;
 
-    const float yOffset = 0.f;
-
     for (std::size_t row = 0; row < rows.size(); ++row)
     {
         for (std::size_t col = 0; col < rows[row].size(); ++col)
         {
             float x = static_cast<float>(col) * tile;
-            float y = yOffset + static_cast<float>(row) * tile;
+            float y = static_cast<float>(row) * tile;
 
             switch (rows[row][col])
             {
@@ -595,8 +592,7 @@ void Game::loadMap(const std::string &name)
                 platforms.emplace_back(x, y, tile, tile, PlatformType::buttonControlled);
                 break;
 
-            case '.':
-            case '8':
+            default:
                 break;
             }
         }

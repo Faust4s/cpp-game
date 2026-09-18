@@ -13,8 +13,6 @@ public:
     Door(float x, float y, float width, float height, DoorType type);
 
     DoorType getType();
-    bool isOpen() const;
-    void open();
     void setOpen(bool state);
 
 private:

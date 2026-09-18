@@ -1,5 +1,4 @@
 #include "Button.hpp"
-#include "Config.hpp"
 #include "Assets.hpp"
 
 Button::Button(float x, float y, float width, float height)

@@ -25,8 +25,7 @@ public:
 
 private:
 
-    // unlocked levels by default 
-    int unlockedLevels = 1;
+    int unlockedLevels;
 
     // handlers
     void handleMainMenuInput(sf::Keyboard::Key key);
@@ -49,8 +48,6 @@ private:
     void updateDoors(float dt);
     void update();
     void updateButtons();
-
-    void updateEnemies(float dt);
 
     // other
     void render();

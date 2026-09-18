@@ -1,5 +1,4 @@
 #include "Player.hpp"
-#include <cmath>
 
 Player::Player(float x, float y, sf::Color color, const std::string &spriteFile)
 {
@@ -60,31 +59,6 @@ void Player::applyGravity(float dt)
     animator.syncPosition(shape.getPosition(), shape.getSize());
 }
 
-bool Player::isOnGround(const sf::RectangleShape &ground)
-{
-    const sf::FloatRect playerBounds = shape.getGlobalBounds();
-    const sf::FloatRect groundBounds = ground.getGlobalBounds();
-
-    const float playerBottom = playerBounds.top + playerBounds.height;
-    const float playerRight = playerBounds.left + playerBounds.width;
-    const float groundRight = groundBounds.left + groundBounds.width;
-
-    const bool overlapsHorizontally =
-        playerRight > groundBounds.left && playerBounds.left < groundRight;
-
-    return overlapsHorizontally && playerBottom >= groundBounds.top;
-}
-
-void Player::stopFalling(const sf::RectangleShape &ground)
-{
-    velocityY = 0.f;
-    onGround = true;
-    float groundTop = ground.getPosition().y;
-    float playerHeight = shape.getSize().y;
-    shape.setPosition(shape.getPosition().x, groundTop - playerHeight);
-    animator.syncPosition(shape.getPosition(), shape.getSize());
-}
-
 void Player::jump()
 {
     if (onGround)
@@ -115,11 +89,6 @@ void Player::setPositionY(float y)
 {
     shape.setPosition(shape.getPosition().x, y);
     animator.syncPosition(shape.getPosition(), shape.getSize());
-}
-
-void Player::setVelocityX(float v)
-{
-    velocityX = v;
 }
 
 void Player::setVelocityY(float v)
@@ -178,7 +147,6 @@ void Player::setSpawnPoint(float x, float y)
 void Player::respawn()
 {
     shape.setPosition(spawnX, spawnY);
-    velocityX = 0.f;
     velocityY = 0.f;
     previousX = spawnX;
     animator.resetToIdle();

@@ -10,4 +10,4 @@ build/
 *.obj
 
 .vscode/
-CLAUDE.md
+.idea/

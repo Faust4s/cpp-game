@@ -36,12 +36,10 @@ void CollisionManager::resolveCollision(Player &player, const sf::FloatRect &pla
     if (minOverlap == overlapLeft)
     {
         player.setPositionX(platformBounds.left - playerBounds.width);
-        player.setVelocityX(0.f);
     }
     else if (minOverlap == overlapRight)
     {
         player.setPositionX(platformRightX);
-        player.setVelocityX(0.f);
     }
     else if (minOverlap == overlapTop)
     {

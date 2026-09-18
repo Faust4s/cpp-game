@@ -11,11 +11,9 @@ public:
     void playGameMusic();
     void playDeathMusic();
     void stopMusic();
-    void setMusicVolume(float volume);
 
     // sound effects
     void playGemCollect();
-    void playDeath();
     void playWin();
 
     void stopAllSounds(); // for player death

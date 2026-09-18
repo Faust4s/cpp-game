@@ -3,7 +3,6 @@
 #include "Config.hpp"
 #include "Assets.hpp"
 #include <string>
-#include <iostream>
 
 SoundManager::SoundManager()
 {
@@ -75,8 +74,7 @@ void SoundManager::toggleSoundMuted()
     SettingsManager::save(musicMuted, soundMuted);
 }
 
-void SoundManager::stopMusic()                  { music.stop(); }
-void SoundManager::setMusicVolume(float volume) { music.setVolume(volume); }
+void SoundManager::stopMusic(){ music.stop(); }
 
 void SoundManager::playGemCollect()
 {

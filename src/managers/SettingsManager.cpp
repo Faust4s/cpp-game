@@ -2,8 +2,6 @@
 #include "Assets.hpp"
 #include <fstream>
 
-static const std::string SETTINGS_FILE = Assets::SaveFiles::SETTINGS;
-
 void SettingsManager::save(bool musicMuted, bool soundMuted)
 {
     std::ofstream out(Assets::SaveFiles::SETTINGS, std::ios::binary);

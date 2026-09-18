@@ -25,19 +25,6 @@ Door::Door(float x, float y, float width, float height, DoorType type)
 }
 
 DoorType Door::getType()  { return type; }
-bool Door::isOpen() const { return opened; }
-void Door::open()
-{
-    if (opened)
-        return;
-
-    opened = true;
-
-    if (type == DoorType::playerOneDoor)
-        applyTexture(Assets::Textures::DOOR_PLAYER_ONE_OPEN);
-    else
-        applyTexture(Assets::Textures::DOOR_PLAYER_TWO_OPEN);
-}
 
 void Door::setOpen(bool state)
 {

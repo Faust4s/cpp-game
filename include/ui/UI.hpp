@@ -8,7 +8,6 @@ enum class MenuAction
     Resume,
     Restart,
     Exit,
-    LevelSelect,
     LevelChosen,
     BackToLevels,
     Continue,

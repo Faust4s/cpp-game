@@ -43,9 +43,6 @@ namespace Config
     // Door
     constexpr float DOOR_SCALE = 2.f;
 
-    // Button
-    constexpr float BUTTON_SCALE = 2.f;
-
     // Audio
     constexpr float MUSIC_VOLUME = 20.f;
     constexpr float GEM_SOUND_VOLUME = 30.f;
