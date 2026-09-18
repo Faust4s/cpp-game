@@ -11,16 +11,25 @@ public:
     void playGameMusic();
     void playDeathMusic();
     void stopMusic();
-    void setMusicVolume(float volume);
 
     // sound effects
     void playGemCollect();
-    void playDeath();
     void playWin();
 
-    void stopAllSounds();
+    void stopAllSounds(); // for player death
+
+    // Option to mute music
+    void toggleMusicMuted();
+    bool isMusicMuted() const { return musicMuted; }
+
+    // Option to mute sound
+    void toggleSoundMuted();
+    bool isSoundMuted() const { return soundMuted; }
 
 private:
+    bool musicMuted = false;
+    bool soundMuted = false;
+
     sf::Music music;
 
     sf::SoundBuffer gemBuffer;

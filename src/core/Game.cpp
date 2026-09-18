@@ -1,10 +1,11 @@
 #include "Game.hpp"
+#include "Assets.hpp"
 #include <fstream>
 
 Game::Game()
     : window(sf::VideoMode(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT), "2D Game", sf::Style::Titlebar | sf::Style::Close),
-      playerOne(120.f, 500.f, sf::Color::Red, "textures/warmsprite.png"),
-      playerTwo(520.f, 500.f, sf::Color::Blue, "textures/coldsprite.png"),
+      playerOne(120.f, 500.f, sf::Color::Red, Assets::Textures::PLAYER_ONE),
+      playerTwo(520.f, 500.f, sf::Color::Blue, Assets::Textures::PLAYER_TWO),
       playerOneInput(sf::Keyboard::A, sf::Keyboard::D, sf::Keyboard::W),
       playerTwoInput(sf::Keyboard::Left, sf::Keyboard::Right, sf::Keyboard::Up),
       bgManager(window)
@@ -29,7 +30,6 @@ Game::Game()
     playerOne.addAllowed(DoorType::playerOneDoor);
     playerTwo.addAllowed(DoorType::playerTwoDoor);
 
-    loadMap("map.txt");
 }
 
 // Game loop
@@ -58,8 +58,14 @@ void Game::processEvents()
             case GameState::MainMenu:
                 handleMainMenuInput(event.key.code);
                 break;
+            case GameState::Settings:
+                handleSettingsInput(event.key.code);
+                break;
             case GameState::Instructions:
                 handleInstructionsInput(event.key.code);
+                break;
+            case GameState::Credits:
+                handleCreditsInput(event.key.code);
                 break;
             case GameState::LevelSelect:
                 handleLevelSelectInput(event.key.code);
@@ -86,16 +92,31 @@ void Game::handleMainMenuInput(sf::Keyboard::Key key)
     MenuAction action = ui.handleMainMenu(key);
     if (action == MenuAction::Play)
     {
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         ui.resetIndex();
     }
     if (action == MenuAction::Instructions)
     {
-        gameState = GameState::Instructions;
+        changeStateWithFade(GameState::Instructions);
+        ui.resetIndex();
+    }
+    if (action == MenuAction::Credits)
+    {
+        changeStateWithFade(GameState::Credits);
         ui.resetIndex();
     }
     if (action == MenuAction::Exit)
         window.close();
+}
+
+void Game::handleCreditsInput(sf::Keyboard::Key key)
+{
+    MenuAction action = ui.handleCredits(key);
+    if (action == MenuAction::Back)
+    {
+        changeStateWithFade(GameState::MainMenu);
+        ui.resetIndex();
+    }
 }
 
 void Game::handleInstructionsInput(sf::Keyboard::Key key)
@@ -103,7 +124,7 @@ void Game::handleInstructionsInput(sf::Keyboard::Key key)
     MenuAction action = ui.handleInstructions(key);
     if (action == MenuAction::Back)
     {
-        gameState = GameState::MainMenu;
+        changeStateWithFade(GameState::MainMenu);
         ui.resetIndex();
     }
 }
@@ -114,14 +135,14 @@ void Game::handleLevelSelectInput(sf::Keyboard::Key key)
     if (action == MenuAction::LevelChosen)
     {
         loadLevel(ui.getSelectedLevel());
-        gameState = GameState::Playing;
+        changeStateWithFade(GameState::Playing);
         sounds.stopAllSounds();
         sounds.playGameMusic();
         ui.resetIndex();
     }
     if (action == MenuAction::Back)
     {
-        gameState = GameState::MainMenu;
+        changeStateWithFade(GameState::MainMenu);
         ui.resetIndex();
     }
 }
@@ -153,8 +174,13 @@ void Game::handlePausedInput(sf::Keyboard::Key key)
     if (action == MenuAction::BackToLevels)
     {
         sounds.stopAllSounds();
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         sounds.playMenuMusic();
+        ui.resetIndex();
+    }
+    if (action == MenuAction::Settings)
+    {
+        gameState = GameState::Settings;
         ui.resetIndex();
     }
     if (action == MenuAction::Exit)
@@ -166,7 +192,7 @@ void Game::handleWinInput(sf::Keyboard::Key key)
 
     if (currentLevel + 1 >= unlockedLevels && unlockedLevels < Config::LEVEL_COUNT)
     {
-        unlockedLevels = currentLevel + 2; // +2 cause currentLevel 0-based
+        unlockedLevels = std::min(currentLevel + 2, Config::LEVEL_COUNT);
         SaveManager::save(unlockedLevels);
     }
 
@@ -175,9 +201,9 @@ void Game::handleWinInput(sf::Keyboard::Key key)
     if (action == MenuAction::Continue)
     {
         sounds.stopAllSounds();
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         sounds.playMenuMusic();
-        ui.resetIndex();
+        ui.setSelectedIndex(currentLevel);
     }
     if (action == MenuAction::Restart)
     {
@@ -203,12 +229,26 @@ void Game::handleLoseInput(sf::Keyboard::Key key)
     if (action == MenuAction::BackToLevels)
     {
         sounds.stopAllSounds();
-        gameState = GameState::LevelSelect;
+        changeStateWithFade(GameState::LevelSelect);
         sounds.playMenuMusic();
         ui.resetIndex();
     }
     if (action == MenuAction::Exit)
         window.close();
+}
+
+void Game::handleSettingsInput(sf::Keyboard::Key key)
+{
+    MenuAction action = ui.handleSettings(key);
+    if (action == MenuAction::ToggleMusic)
+        sounds.toggleMusicMuted();
+    if (action == MenuAction::ToggleSound)
+        sounds.toggleSoundMuted();
+    if (action == MenuAction::Back)
+    {
+        gameState = GameState::Paused;
+        ui.resetIndex();
+    }
 }
 
 void Game::restart()
@@ -219,12 +259,14 @@ void Game::restart()
 
 void Game::update()
 {
-    if (gameState != GameState::Playing)
-        return;
-
     float dt = clock.restart().asSeconds();
     if (dt > Config::MAX_DT)
         dt = Config::MAX_DT;
+
+    updateFade(dt);
+
+    if (gameState != GameState::Playing)
+        return;
 
     updatePlatforms(dt);
     updateButtons();
@@ -232,10 +274,7 @@ void Game::update()
 
     if (updateHazards())
         return;
-    if (checkEnemyCollisions())
-        return;
 
-    updateEnemies(dt);
     updateGems();
     updateDoors(dt);
 
@@ -314,22 +353,23 @@ void Game::updateDoors(float dt)
     bool p1AtDoor = false;
     bool p2AtDoor = false;
 
-    for (auto *p : players)
+    for (auto &d : doors)
     {
-        for (auto &d : doors)
+        bool playerHere = false;
+
+        for (auto *p : players)
         {
-            if (collision.checkDoorCollision(*p, d))
+            if (collision.checkDoorCollision(*p, d) && p->canTouch(d.getType()) && allGemsCollected())
             {
-                if (p->canTouch(d.getType()) && allGemsCollected())
-                {
-                    d.open();
-                    if (d.getType() == DoorType::playerOneDoor)
-                        p1AtDoor = true;
-                    if (d.getType() == DoorType::playerTwoDoor)
-                        p2AtDoor = true;
-                }
+                playerHere = true;
+                if (d.getType() == DoorType::playerOneDoor)
+                    p1AtDoor = true;
+                if (d.getType() == DoorType::playerTwoDoor)
+                    p2AtDoor = true;
             }
         }
+
+        d.setOpen(playerHere);
     }
 
     if (p1AtDoor && p2AtDoor)
@@ -374,7 +414,8 @@ void Game::render()
 
     bgManager.draw(window, gameState);
 
-    if (gameState != GameState::MainMenu && gameState != GameState::LevelSelect && gameState != GameState::Instructions)
+    if (gameState != GameState::MainMenu && gameState != GameState::LevelSelect &&
+        gameState != GameState::Instructions && gameState != GameState::Credits)
     {
         for (auto &platform : platforms)
             platform.draw(window);
@@ -387,8 +428,6 @@ void Game::render()
             d.draw(window);
         for (auto &b : buttons)
             b.draw(window);
-        for (auto &e : enemies)
-            e.draw(window);
 
         playerTwo.draw(window);
         playerOne.draw(window);
@@ -397,6 +436,8 @@ void Game::render()
             ui.renderGemCounter(window, playerOne.getGemCount(), playerTwo.getGemCount());
         else if (gameState == GameState::Paused)
             ui.renderPauseMenu(window);
+        else if (gameState == GameState::Settings)
+            ui.renderSettings(window, sounds.isMusicMuted(), sounds.isSoundMuted());
         else if (gameState == GameState::Win)
             ui.renderWinScreen(window, playerOne.getGemCount(), playerTwo.getGemCount());
         else if (gameState == GameState::Lose)
@@ -410,9 +451,42 @@ void Game::render()
             ui.renderInstructions(window);
         else if (gameState == GameState::LevelSelect)
             ui.renderLevelSelect(window, Config::LEVEL_COUNT, unlockedLevels);
+        else if (gameState == GameState::Credits)
+            ui.renderCredits(window);
     }
+    sf::RectangleShape fadeOverlay(sf::Vector2f(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT));
+    fadeOverlay.setFillColor(sf::Color(0, 0, 0, static_cast<sf::Uint8>(fadeAlpha)));
+    window.draw(fadeOverlay);
 
     window.display();
+}
+
+void Game::changeStateWithFade(GameState newState)
+{
+    pendingState = newState;
+    fadingOut = true;
+}
+
+void Game::updateFade(float dt)
+{
+    float speed = 1800.f;
+
+    if (fadingOut)
+    {
+        fadeAlpha += speed * dt;
+        if (fadeAlpha >= 255.f)
+        {
+            fadeAlpha = 255.f;
+            gameState = pendingState;
+            fadingOut = false;
+        }
+    }
+    else if (fadeAlpha > 0.f)
+    {
+        fadeAlpha -= speed * dt;
+        if (fadeAlpha < 0.f)
+            fadeAlpha = 0.f;
+    }
 }
 
 bool Game::allGemsCollected()
@@ -433,63 +507,6 @@ void Game::updatePlayer(Player &player, const InputHandler &inputHandler, float 
         player.jump();
 }
 
-void Game::updateEnemies(float dt)
-{
-    for (auto &e : enemies)
-    {
-        if (!e.isAlive())
-            continue;
-        e.update(dt, players);
-        e.applyGravity(dt);
-        collision.check(e, platforms, window);
-
-        // iškrito iš ekrano
-        if (e.getBounds().top > window.getSize().y)
-            e.kill();
-    }
-}
-
-bool Game::checkEnemyCollisions()
-{
-    for (auto &e : enemies)
-    {
-        if (!e.isAlive())
-            continue;
-
-        // hazard nužudo enemy
-        for (auto &h : hazards)
-            if (collision.checkHazardCollision(e, h))
-                e.kill();
-
-        // žaidėjas užšoka ant enemy iš viršaus
-        for (auto *p : players)
-        {
-            sf::FloatRect pBounds = p->getBounds();
-            sf::FloatRect eBounds = e.getBounds();
-
-            if (pBounds.intersects(eBounds))
-            {
-                float playerBottom = pBounds.top + pBounds.height;
-                float enemyTop = eBounds.top;
-
-                if (playerBottom <= enemyTop + 10.f && p->getVelocityY() > 0.f)
-                {
-                    e.kill(); // žaidėjas nušoka ant enemy
-                }
-                else
-                {
-                    // enemy liečia žaidėją iš šono – žaidėjas miršta
-                    gameState = GameState::Lose;
-                    sounds.stopMusic();
-                    sounds.playDeathMusic();
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
 void Game::loadLevel(int levelIndex)
 {
     currentLevel = levelIndex;
@@ -507,7 +524,6 @@ void Game::loadMap(const std::string &name)
     doors.clear();
     gems.clear();
     buttons.clear();
-    enemies.clear();
 
     std::ifstream in(std::string(GAME_ASSET_DIR) + "/" + name);
     if (!in)
@@ -523,14 +539,12 @@ void Game::loadMap(const std::string &name)
     if (rows.empty())
         return;
 
-    const float yOffset = 0.f;
-
     for (std::size_t row = 0; row < rows.size(); ++row)
     {
         for (std::size_t col = 0; col < rows[row].size(); ++col)
         {
             float x = static_cast<float>(col) * tile;
-            float y = yOffset + static_cast<float>(row) * tile;
+            float y = static_cast<float>(row) * tile;
 
             switch (rows[row][col])
             {
@@ -559,13 +573,6 @@ void Game::loadMap(const std::string &name)
                     x + (tile - playerTwo.getBounds().width) * 0.5f,
                     y + tile - playerTwo.getBounds().height);
                 break;
-            case 'A':
-                enemies.emplace_back(
-                    x + (tile - Config::ENEMY_HITBOX * Config::ENEMY_HITBOX_WIDTH_SCALE) * 0.5f,
-                    y + tile - Config::ENEMY_HITBOX * Config::ENEMY_HITBOX_HEIGHT_SCALE,
-                    sf::Color::Green,
-                    Config::ENEMY_TEXTURE);
-                break;
             case 'R':
                 gems.emplace_back(x, y, tile, tile, GemType::redGem);
                 break;
@@ -585,8 +592,7 @@ void Game::loadMap(const std::string &name)
                 platforms.emplace_back(x, y, tile, tile, PlatformType::buttonControlled);
                 break;
 
-            case '.':
-            case '8':
+            default:
                 break;
             }
         }

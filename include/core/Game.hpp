@@ -15,7 +15,6 @@
 #include "GameState.hpp"
 #include "Button.hpp"
 #include "SaveManager.hpp"
-#include "Enemy.hpp"
 
 class Game 
 {
@@ -26,8 +25,7 @@ public:
 
 private:
 
-    // unlocked levels by default 
-    int unlockedLevels = 1;
+    int unlockedLevels;
 
     // handlers
     void handleMainMenuInput(sf::Keyboard::Key key);
@@ -37,6 +35,8 @@ private:
     void handlePausedInput(sf::Keyboard::Key key);
     void handleWinInput(sf::Keyboard::Key key);
     void handleLoseInput(sf::Keyboard::Key key);
+    void handleCreditsInput(sf::Keyboard::Key key);
+    void handleSettingsInput(sf::Keyboard::Key key);
     void processEvents();
     
     // update
@@ -49,14 +49,20 @@ private:
     void update();
     void updateButtons();
 
-    void updateEnemies(float dt);
-    bool checkEnemyCollisions();
-
     // other
     void render();
     void restart();
     bool allGemsCollected();
     void loadMap(const std::string& filename);
+
+    // transition
+    float fadeAlpha = 0.f;
+    bool fadingOut = false;
+    GameState pendingState;
+
+    void changeStateWithFade(GameState newState);
+    void updateFade(float dt);
+
 
     // window & state
     sf::RenderWindow window;
@@ -69,7 +75,6 @@ private:
     Player playerOne;
     Player playerTwo;
     std::vector<Player*> players;
-    std::vector<Enemy> enemies;
     InputHandler playerOneInput;
     InputHandler playerTwoInput;
 

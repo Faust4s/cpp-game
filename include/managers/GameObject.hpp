@@ -4,7 +4,7 @@
 class GameObject
 {
 public:
-    virtual void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window);
     sf::FloatRect getBounds();
 
 protected:

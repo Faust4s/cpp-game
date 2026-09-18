@@ -48,7 +48,6 @@ public:
     // setters
     void setPositionX(float x);
     void setPositionY(float y);
-    void setVelocityX(float v);
     void setVelocityY(float v);
     void setOnGround(bool v);
     void setSpawnPoint(float x, float y);
@@ -58,7 +57,6 @@ private:
     float spawnX = 0.f;
     float spawnY = 0.f;
     float velocityY = 0.f;
-    float velocityX = 0.f;
     float speed    = Config::PLAYER_SPEED;
     float gravity  = Config::PLAYER_GRAVITY;
     float previousX = 0.f; // used in SpriteAnimator::update()

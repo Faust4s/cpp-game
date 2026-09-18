@@ -3,10 +3,6 @@
 namespace Config
 {
     // Window
-    constexpr char BACKGROUND_TEXTURE[] = "cobblestone_bg.png";
-    constexpr char MENU_BACKGROUND_TEXTURE[] = "mainMenu_bg.png";
-    constexpr char UI_FONT[] = "/font.ttf";
-
     constexpr unsigned WINDOW_WIDTH = 768;
     constexpr unsigned WINDOW_HEIGHT = 576;
     constexpr unsigned FPS_LIMIT = 60;
@@ -28,18 +24,6 @@ namespace Config
     constexpr float PLAYER_HITBOX_WIDTH_SCALE = 0.6f;
     constexpr float PLAYER_HITBOX_HEIGHT_SCALE = 0.9f;
 
-    // Enemy
-    constexpr float ENEMY_SPEED = 80.f;
-    constexpr float ENEMY_JUMP = -300.f;
-    constexpr float ENEMY_DETECTION = 200.f; // pixels
-    constexpr float ENEMY_GRAVITY = 1500.f;
-    constexpr char ENEMY_TEXTURE[] = "textures/warmsprite.png";
-
-    // Enemy hitbox
-    constexpr float ENEMY_HITBOX = 50.f;
-    constexpr float ENEMY_HITBOX_WIDTH_SCALE = 0.6f;
-    constexpr float ENEMY_HITBOX_HEIGHT_SCALE = 0.9f;
-
     // Platform
     constexpr float PLATFORM_SPEED = 60.f;
     constexpr float PLATFORM_MOVE_RANGE = 50.f;
@@ -50,7 +34,7 @@ namespace Config
     // Levels
     constexpr int LEVEL_COUNT = 6;
 
-    // Delta time
+    // Delta time (for frames)
     constexpr float MAX_DT = 0.05f;
 
     // Time of door opening
@@ -59,7 +43,9 @@ namespace Config
     // Door
     constexpr float DOOR_SCALE = 2.f;
 
-    // Button
-    constexpr float BUTTON_SCALE = 2.f;
+    // Audio
+    constexpr float MUSIC_VOLUME = 20.f;
+    constexpr float GEM_SOUND_VOLUME = 30.f;
+    constexpr float WIN_SOUND_VOLUME = 20.f;
 
 }

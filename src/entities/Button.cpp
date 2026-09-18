@@ -1,12 +1,12 @@
 #include "Button.hpp"
-#include "Config.hpp"
+#include "Assets.hpp"
 
 Button::Button(float x, float y, float width, float height)
 {
     shape.setSize(sf::Vector2f(width, height));
     shape.setPosition(x, y);
 
-    applyTexture("button_unpressed.png");
+    applyTexture(Assets::Textures::BUTTON_UNPRESSED);
 }
 
 void Button::setPressed(bool p)
@@ -15,7 +15,7 @@ void Button::setPressed(bool p)
         return;
         
     pressed = p;
-    applyTexture(pressed ? "button_pressed.png" : "button_unpressed.png");
+    applyTexture(pressed ? Assets::Textures::BUTTON_PRESSED : Assets::Textures::BUTTON_UNPRESSED);
 }
 
 bool Button::isPressed() const { return pressed; }

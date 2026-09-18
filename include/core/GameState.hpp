@@ -4,6 +4,8 @@ enum class GameState
 {
     MainMenu,
     Instructions,
+    Credits,
+    Settings,
     LevelSelect,
     Playing,
     Paused,

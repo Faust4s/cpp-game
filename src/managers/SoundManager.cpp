@@ -1,17 +1,21 @@
 #include "SoundManager.hpp"
+#include "SettingsManager.hpp"
+#include "Config.hpp"
+#include "Assets.hpp"
 #include <string>
-#include <iostream>
 
 SoundManager::SoundManager()
 {
-    if (gemBuffer.loadFromFile(std::string(GAME_ASSET_DIR) + "/sounds/gem_sound.wav"))
+    SettingsManager::load(musicMuted, soundMuted);
+
+    if (gemBuffer.loadFromFile(std::string(GAME_ASSET_DIR) + Assets::Sounds::GEM))
     {
         gemSound.setBuffer(gemBuffer);
-        gemSound.setVolume(30.f); 
+        gemSound.setVolume(Config::GEM_SOUND_VOLUME);
     }
-    if (winBuffer.loadFromFile(std::string(GAME_ASSET_DIR) + "/sounds/win_sound.wav")){
+    if (winBuffer.loadFromFile(std::string(GAME_ASSET_DIR) + Assets::Sounds::WIN)){
         winSound.setBuffer(winBuffer);
-        winSound.setVolume(20.f); 
+        winSound.setVolume(Config::WIN_SOUND_VOLUME);
     }
 
     playMenuMusic();
@@ -20,10 +24,10 @@ SoundManager::SoundManager()
 void SoundManager::playMenuMusic()
 {
     music.stop();
-    if (music.openFromFile(std::string(GAME_ASSET_DIR) + "/sounds/menu_music.wav"))
+    if (music.openFromFile(std::string(GAME_ASSET_DIR) + Assets::Sounds::MENU_MUSIC))
     {
         music.setLoop(true);
-        music.setVolume(20.f);
+        music.setVolume(musicMuted ? 0.f : Config::MUSIC_VOLUME);
         music.play();
     }
 }
@@ -31,10 +35,10 @@ void SoundManager::playMenuMusic()
 void SoundManager::playGameMusic()
 {
     music.stop();
-    if (music.openFromFile(std::string(GAME_ASSET_DIR) + "/sounds/background_music.ogg"))
+    if (music.openFromFile(std::string(GAME_ASSET_DIR) + Assets::Sounds::GAME_MUSIC))
     {
         music.setLoop(true);
-        music.setVolume(20.f);
+        music.setVolume(musicMuted ? 0.f : Config::MUSIC_VOLUME);
         music.play();
     }
 }
@@ -42,10 +46,10 @@ void SoundManager::playGameMusic()
 void SoundManager::playDeathMusic()
 {
     music.stop();
-    if (music.openFromFile(std::string(GAME_ASSET_DIR) + "/sounds/lose_music.wav"))
-    {   
+    if (music.openFromFile(std::string(GAME_ASSET_DIR) + Assets::Sounds::LOSE_MUSIC))
+    {
         music.setLoop(false);
-        music.setVolume(20.f);
+        music.setVolume(musicMuted ? 0.f : Config::MUSIC_VOLUME);
         music.play();
     }
 }
@@ -57,8 +61,29 @@ void SoundManager::stopAllSounds()
     winSound.stop();
 }
 
-void SoundManager::stopMusic()                  { music.stop(); }
-void SoundManager::setMusicVolume(float volume) { music.setVolume(volume); }
+void SoundManager::toggleMusicMuted()
+{
+    musicMuted = !musicMuted;
+    music.setVolume(musicMuted ? 0.f : Config::MUSIC_VOLUME);
+    SettingsManager::save(musicMuted, soundMuted);
+}
 
-void SoundManager::playGemCollect()             { gemSound.play(); }
-void SoundManager::playWin()                    { winSound.play(); }
+void SoundManager::toggleSoundMuted()
+{
+    soundMuted = !soundMuted;
+    SettingsManager::save(musicMuted, soundMuted);
+}
+
+void SoundManager::stopMusic(){ music.stop(); }
+
+void SoundManager::playGemCollect()
+{
+    if (!soundMuted)
+        gemSound.play();
+}
+
+void SoundManager::playWin()
+{
+    if (!soundMuted)
+        winSound.play();
+}

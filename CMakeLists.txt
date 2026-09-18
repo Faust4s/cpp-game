@@ -18,6 +18,10 @@ target_compile_options(game PRIVATE
     -Wall
     -Wextra
     -Wpedantic
+    -Wunused
+    -Wunused-function
+    -Wunused-parameter
+    -Wunreachable-code
 )
 target_compile_definitions(game PRIVATE GAME_ASSET_DIR="${CMAKE_SOURCE_DIR}/assets")
 

@@ -1,4 +1,5 @@
 #include "Platform.hpp"
+#include "Assets.hpp"
 
 Platform::Platform(float x, float y, float width, float height, PlatformType type)
     : type(type)
@@ -7,11 +8,11 @@ Platform::Platform(float x, float y, float width, float height, PlatformType typ
     shape.setPosition(x, y);
 
     if (type == PlatformType::movingVertically)
-        applyTexture("platform.png");
+        applyTexture(Assets::Textures::PLATFORM);
     else if (type == PlatformType::buttonControlled)
-        applyTexture("platform.png");  // this could be different texture for moving platform!
+        applyTexture(Assets::Textures::PLATFORM);  // this could be different texture for moving platform!
     else
-        applyTexture("tile.png");
+        applyTexture(Assets::Textures::TILE);
 
     startY = y;
 }
@@ -40,14 +41,14 @@ void Platform::update(float dt)
         if (active)
         {
             // moves down until the limit
-            if (currentY < startY + Config::PLATFORM_MOVE_RANGE)
-                shape.move(0.f, Config::PLATFORM_SPEED * dt);
+            if (currentY < startY + moveRange)
+                shape.move(0.f, speed * dt);
         }
         else
         {
             // get back to its starting position
             if (currentY > startY)
-                shape.move(0.f, -Config::PLATFORM_SPEED * dt);
+                shape.move(0.f, -speed * dt);
         }
     }
 }

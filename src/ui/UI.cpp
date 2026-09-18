@@ -1,10 +1,10 @@
 #include "UI.hpp"
-#include "SaveManager.hpp"
 #include "Config.hpp"
+#include "Assets.hpp"
 
 UI::UI()
 {
-    font.loadFromFile(std::string(GAME_ASSET_DIR) + Config::UI_FONT);
+    font.loadFromFile(std::string(GAME_ASSET_DIR) + Assets::Fonts::UI);
 }
 
 void UI::renderMenu(sf::RenderWindow &window, const std::string &title,
@@ -31,12 +31,12 @@ void UI::renderMenu(sf::RenderWindow &window, const std::string &title,
 
 void UI::renderMainMenu(sf::RenderWindow &window)
 {
-    renderMenu(window, "2D Game", {"Play", "Instructions", "Exit"});
+    renderMenu(window, "2D Game", {"Play", "Instructions", "Credits", "Exit"});
 }
 
 void UI::renderPauseMenu(sf::RenderWindow &window)
 {
-    renderMenu(window, "Paused", {"Resume", "Restart", "Back to Levels", "Exit Game"});
+    renderMenu(window, "Paused", {"Resume", "Restart", "Back to Levels", "Settings", "Exit Game"});
 }
 
 void UI::renderWinScreen(sf::RenderWindow &window, int p1Gems, int p2Gems)
@@ -150,7 +150,79 @@ void UI::renderInstructions(sf::RenderWindow &window)
              isOkSelected ? sf::Color::Yellow : sf::Color::White);
 }
 
+void UI::renderCredits(sf::RenderWindow &window)
+{
+    sf::RectangleShape panel(sf::Vector2f(500.f, 400.f));
+    panel.setFillColor(sf::Color(20, 20, 20, 230));
+    panel.setOutlineColor(sf::Color::White);
+    panel.setOutlineThickness(2.f);
+    panel.setPosition(134.f, 100.f);
+    window.draw(panel);
+
+    drawText(window, "Credits", 300.f, 120.f, 36, sf::Color::Yellow);
+
+    std::string credits =
+        "Game Design & Programming:\n"
+        "  - Faustas Alekna\n"
+        "  - Gustas Juskevicius\n\n"
+        "Made with C++ / SFML";
+
+    drawText(window, credits, 160.f, 200.f, 20, sf::Color::White);
+
+    bool isOkSelected = (selectedIndex == 0);
+    drawText(window, isOkSelected ? "> OK" : "OK", 370.f, 450.f, 24,
+             isOkSelected ? sf::Color::Yellow : sf::Color::White);
+}
+
+void UI::renderSettings(sf::RenderWindow &window, bool musicMuted, bool soundMuted)
+{
+    sf::RectangleShape panel(sf::Vector2f(500.f, 300.f));
+    panel.setFillColor(sf::Color(20, 20, 20, 230));
+    panel.setOutlineColor(sf::Color::White);
+    panel.setOutlineThickness(2.f);
+    panel.setPosition(134.f, 140.f);
+    window.draw(panel);
+
+    drawText(window, "Settings", 300.f, 160.f, 36, sf::Color::Yellow);
+
+    std::string musicLabel = "Music: " + std::string(musicMuted ? "OFF" : "ON");
+    bool isMusicSelected = (selectedIndex == 0);
+    drawText(window, isMusicSelected ? "> " + musicLabel : musicLabel,
+             200.f, 230.f, 28, isMusicSelected ? sf::Color::Yellow : sf::Color::White);
+
+    std::string soundLabel = "Sound: " + std::string(soundMuted ? "OFF" : "ON");
+    bool isSoundSelected = (selectedIndex == 1);
+    drawText(window, isSoundSelected ? "> " + soundLabel : soundLabel,
+             200.f, 280.f, 28, isSoundSelected ? sf::Color::Yellow : sf::Color::White);
+
+    bool isBackSelected = (selectedIndex == 2);
+    drawText(window, isBackSelected ? "> Back" : "Back",
+             300.f, 340.f, 28, isBackSelected ? sf::Color::Yellow : sf::Color::White);
+}
+
+MenuAction UI::handleSettings(sf::Keyboard::Key key)
+{
+    if (key == sf::Keyboard::Up)
+        selectedIndex = (selectedIndex - 1 + 3) % 3;
+    if (key == sf::Keyboard::Down)
+        selectedIndex = (selectedIndex + 1) % 3;
+    if (key == sf::Keyboard::Return)
+    {
+        if (selectedIndex == 0) return MenuAction::ToggleMusic;
+        if (selectedIndex == 1) return MenuAction::ToggleSound;
+        if (selectedIndex == 2) return MenuAction::Back;
+    }
+    return MenuAction::None;
+}
+
 MenuAction UI::handleInstructions(sf::Keyboard::Key key)
+{
+    if (key == sf::Keyboard::Return)
+        return MenuAction::Back;
+    return MenuAction::None;
+}
+
+MenuAction UI::handleCredits(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Return)
         return MenuAction::Back;
@@ -160,9 +232,9 @@ MenuAction UI::handleInstructions(sf::Keyboard::Key key)
 MenuAction UI::handleMainMenu(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Up)
-        selectedIndex = (selectedIndex - 1 + 3) % 3;
+        selectedIndex = (selectedIndex - 1 + 4) % 4;
     if (key == sf::Keyboard::Down)
-        selectedIndex = (selectedIndex + 1) % 3;
+        selectedIndex = (selectedIndex + 1) % 4;
     if (key == sf::Keyboard::Return)
     {
         if (selectedIndex == 0)
@@ -170,6 +242,8 @@ MenuAction UI::handleMainMenu(sf::Keyboard::Key key)
         if (selectedIndex == 1)
             return MenuAction::Instructions;
         if (selectedIndex == 2)
+            return MenuAction::Credits;
+        if (selectedIndex == 3)
             return MenuAction::Exit;
     }
     return MenuAction::None;
@@ -178,19 +252,16 @@ MenuAction UI::handleMainMenu(sf::Keyboard::Key key)
 MenuAction UI::handlePauseMenu(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Up)
-        selectedIndex = (selectedIndex - 1 + 4) % 4;
+        selectedIndex = (selectedIndex - 1 + 5) % 5;
     if (key == sf::Keyboard::Down)
-        selectedIndex = (selectedIndex + 1) % 4;
+        selectedIndex = (selectedIndex + 1) % 5;
     if (key == sf::Keyboard::Return)
     {
-        if (selectedIndex == 0)
-            return MenuAction::Resume;
-        if (selectedIndex == 1)
-            return MenuAction::Restart;
-        if (selectedIndex == 2)
-            return MenuAction::BackToLevels;
-        if (selectedIndex == 3)
-            return MenuAction::Exit;
+        if (selectedIndex == 0) return MenuAction::Resume;
+        if (selectedIndex == 1) return MenuAction::Restart;
+        if (selectedIndex == 2) return MenuAction::BackToLevels;
+        if (selectedIndex == 3) return MenuAction::Settings;
+        if (selectedIndex == 4) return MenuAction::Exit;
     }
     return MenuAction::None;
 }
@@ -258,6 +329,8 @@ MenuAction UI::handleLevelSelect(sf::Keyboard::Key key, int levelCount, int unlo
     }
     return MenuAction::None;
 }
+
+void UI::setSelectedIndex(int index) { selectedIndex = index; }
 
 void UI::drawText(sf::RenderWindow &window, const std::string &str, float x, float y, unsigned int size, sf::Color color)
 {

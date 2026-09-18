@@ -1,4 +1,5 @@
 #include "Hazard.hpp"
+#include "Assets.hpp"
 
 Hazard::Hazard(float x, float y, float width, float height, HazardType type)
 : type(type)
@@ -7,11 +8,11 @@ Hazard::Hazard(float x, float y, float width, float height, HazardType type)
     shape.setPosition(x, y);
 
     if (type == HazardType::playerOneRiver)
-        applyTexture("orangeriver.png");
+        applyTexture(Assets::Textures::HAZARD_PLAYER_ONE);
     else if (type == HazardType::playerTwoRiver)
-        applyTexture("blueriver.png");
+        applyTexture(Assets::Textures::HAZARD_PLAYER_TWO);
     else
-        applyTexture("neutralriver.png");
+        applyTexture(Assets::Textures::HAZARD_GENERAL);
 }
 
 HazardType Hazard::getType() { return type; }
