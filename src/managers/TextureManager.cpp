@@ -1,4 +1,5 @@
 #include "TextureManager.hpp"
+#include "Assets.hpp"
 
 TextureManager& TextureManager::getInstance()
 {
@@ -13,7 +14,7 @@ sf::Texture* TextureManager::get(const std::string& filename)
         return &it->second;
 
     sf::Texture texture;
-    if (!texture.loadFromFile(std::string(GAME_ASSET_DIR) + "/textures/" + filename))
+    if (!texture.loadFromFile(Assets::texturePath(filename)))
         return nullptr;
 
     texture.setRepeated(true);

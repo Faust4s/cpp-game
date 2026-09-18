@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 /* Kept separate from Config.hpp: Config is for *tunable gameplay numbers*,
  * this is for *where things are on disk*. Texture paths here are resolved
@@ -12,8 +13,8 @@ namespace Assets
         constexpr char BACKGROUND[] = "cobblestone_bg.png";
         constexpr char MENU_BACKGROUND[] = "mainMenu_bg.png";
 
-        constexpr char PLAYER_ONE[] = "textures/warmsprite.png";
-        constexpr char PLAYER_TWO[] = "textures/coldsprite.png";
+        constexpr char PLAYER_ONE[] = "warmsprite.png";
+        constexpr char PLAYER_TWO[] = "coldsprite.png";
 
         constexpr char BUTTON_PRESSED[] = "button_pressed.png";
         constexpr char BUTTON_UNPRESSED[] = "button_unpressed.png";
@@ -32,6 +33,16 @@ namespace Assets
 
         constexpr char PLATFORM[] = "platform.png";
         constexpr char TILE[] = "tile.png";
+    }
+
+    inline std::string texturePath(const std::string& file)
+    {
+        return std::string(GAME_ASSET_DIR) + "/textures/" + file;
+    }
+
+    inline std::string assetPath(const std::string& file)
+    {
+        return std::string(GAME_ASSET_DIR) + file;
     }
 
     namespace Sounds

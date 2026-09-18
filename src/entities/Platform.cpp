@@ -41,14 +41,14 @@ void Platform::update(float dt)
         if (active)
         {
             // moves down until the limit
-            if (currentY < startY + Config::PLATFORM_MOVE_RANGE)
-                shape.move(0.f, Config::PLATFORM_SPEED * dt);
+            if (currentY < startY + moveRange)
+                shape.move(0.f, speed * dt);
         }
         else
         {
             // get back to its starting position
             if (currentY > startY)
-                shape.move(0.f, -Config::PLATFORM_SPEED * dt);
+                shape.move(0.f, -speed * dt);
         }
     }
 }

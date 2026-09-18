@@ -1,5 +1,6 @@
 #include "SpriteAnimator.hpp"
 #include "Config.hpp"
+#include "Assets.hpp"
 #include <cmath>
 
 bool SpriteAnimator::load(const std::string &spriteFile, float hitboxSize)
@@ -12,7 +13,7 @@ bool SpriteAnimator::load(const std::string &spriteFile, float hitboxSize)
 
 void SpriteAnimator::createSpriteSheet(const std::string& spriteFile, float hitboxSize)
 {
-    const std::string spritePath = std::string(GAME_ASSET_DIR) + "/" + spriteFile;
+    const std::string spritePath = Assets::texturePath(spriteFile);
     if (!spriteSheet.loadFromFile(spritePath))
     {
         hasSprite = false;

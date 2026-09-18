@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include <iostream>
 
 Player::Player(float x, float y, sf::Color color, const std::string &spriteFile)
 {
@@ -19,8 +20,11 @@ Player::Player(float x, float y, sf::Color color, const std::string &spriteFile)
     spawnY = y;
     previousX = x;
 
-    if (!spriteFile.empty())
-        animator.load(spriteFile);
+    if (!spriteFile.empty() && !animator.load(spriteFile))
+    {
+        std::cerr << "[Player] Could not load sprite '" << spriteFile
+                  << "' - falling back to a plain rectangle.\n";
+    }
 }
 
 void Player::draw(sf::RenderWindow &window)
