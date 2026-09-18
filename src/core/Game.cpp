@@ -354,22 +354,23 @@ void Game::updateDoors(float dt)
     bool p1AtDoor = false;
     bool p2AtDoor = false;
 
-    for (auto *p : players)
+    for (auto &d : doors)
     {
-        for (auto &d : doors)
+        bool playerHere = false;
+
+        for (auto *p : players)
         {
-            if (collision.checkDoorCollision(*p, d))
+            if (collision.checkDoorCollision(*p, d) && p->canTouch(d.getType()) && allGemsCollected())
             {
-                if (p->canTouch(d.getType()) && allGemsCollected())
-                {
-                    d.open();
-                    if (d.getType() == DoorType::playerOneDoor)
-                        p1AtDoor = true;
-                    if (d.getType() == DoorType::playerTwoDoor)
-                        p2AtDoor = true;
-                }
+                playerHere = true;
+                if (d.getType() == DoorType::playerOneDoor)
+                    p1AtDoor = true;
+                if (d.getType() == DoorType::playerTwoDoor)
+                    p2AtDoor = true;
             }
         }
+
+        d.setOpen(playerHere);
     }
 
     if (p1AtDoor && p2AtDoor)

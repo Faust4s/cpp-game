@@ -26,4 +26,28 @@ Door::Door(float x, float y, float width, float height, DoorType type)
 
 DoorType Door::getType()  { return type; }
 bool Door::isOpen() const { return opened; }
-void Door::open()         { opened = true; }
+void Door::open()
+{
+    if (opened)
+        return;
+
+    opened = true;
+
+    if (type == DoorType::playerOneDoor)
+        applyTexture(Assets::Textures::DOOR_PLAYER_ONE_OPEN);
+    else
+        applyTexture(Assets::Textures::DOOR_PLAYER_TWO_OPEN);
+}
+
+void Door::setOpen(bool state)
+{
+    if (state == opened)
+        return;
+
+    opened = state;
+
+    if (type == DoorType::playerOneDoor)
+        applyTexture(opened ? Assets::Textures::DOOR_PLAYER_ONE_OPEN : Assets::Textures::DOOR_PLAYER_ONE);
+    else
+        applyTexture(opened ? Assets::Textures::DOOR_PLAYER_TWO_OPEN : Assets::Textures::DOOR_PLAYER_TWO);
+}

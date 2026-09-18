@@ -15,6 +15,7 @@ public:
     DoorType getType();
     bool isOpen() const;
     void open();
+    void setOpen(bool state);
 
 private:
     DoorType type;

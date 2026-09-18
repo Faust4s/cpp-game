@@ -39,13 +39,3 @@ make run
 cd build
 make run
 ```
-
-### TODO
-
-- Add door opening door texture (effect)
-- Perėjimo (fade) efektai tarp state'ų (dabar tikriausiai staigus perjungimas)
-- Death effects
-- Gem counter animacija surinkus gemą
-- Change the background ✅
-- fix bugs, polish collision system, build game?
-- forward declaration class player/include

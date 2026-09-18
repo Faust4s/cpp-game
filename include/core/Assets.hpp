@@ -20,6 +20,8 @@ namespace Assets
 
         constexpr char DOOR_PLAYER_ONE[] = "door_red.png";
         constexpr char DOOR_PLAYER_TWO[] = "door_blue.png";
+        constexpr char DOOR_PLAYER_ONE_OPEN[] = "red_opening_doors.png";
+        constexpr char DOOR_PLAYER_TWO_OPEN[] = "blue_opening_doors.png";
 
         constexpr char GEM_RED[] = "firegem.png";
         constexpr char GEM_BLUE[] = "bluegem.png";
