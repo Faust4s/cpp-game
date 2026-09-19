@@ -1,13 +1,31 @@
 #pragma once
+
+#include <climits>
 #include <string>
+#include <filesystem>
+
+#if defined(_WIN32)
+    #include <windows.h>
+#elif defined(__APPLE__)
+    #include <mach-o/dyld.h>
+#else
+    #include <unistd.h>
+#endif
 
 /* Kept separate from Config.hpp: Config is for *tunable gameplay numbers*,
- * this is for *where things are on disk*. Texture paths here are resolved
- * relative to <GAME_ASSET_DIR>/textures/ by TextureManager, same as before.
+ * this is for *where things are on disk*. Every constant below is stored
+ * bare (no directory prefix); use the path helpers at the bottom of this
+ * file to turn one into something loadable. Nobody should be concatenating
+ * a path by hand.
+ *
+ * Asset locations are resolved at RUNTIME relative to the executable's own
+ * directory (see executableDir() below), not baked in at compile time.
+ * This is what makes an installed/zipped build portable.
 */ 
 
 namespace Assets
 {
+    // Bare filenames -- resolve with Assets::texturePath().
     namespace Textures
     {
         constexpr char BACKGROUND[] = "cobblestone_bg.png";
@@ -35,16 +53,6 @@ namespace Assets
         constexpr char TILE[] = "tile.png";
     }
 
-    inline std::string texturePath(const std::string& file)
-    {
-        return std::string(GAME_ASSET_DIR) + "/textures/" + file;
-    }
-
-    inline std::string assetPath(const std::string& file)
-    {
-        return std::string(GAME_ASSET_DIR) + file;
-    }
-
     namespace Sounds
     {
     constexpr char GEM[] = "/sounds/gem_sound.wav";
@@ -63,5 +71,61 @@ namespace Assets
     {
     constexpr char SAVE[] = "save.dat";
     constexpr char SETTINGS[] = "settings.dat";
+    }
+
+    // Directory the running executable actually lives in, computed once.
+    // Deliberately NOT based on argv[0] or the current working directory --
+    // both are unreliable (argv[0] can be a bare name found via PATH; cwd
+    // depends on how the process was launched, e.g. a desktop shortcut's
+    // "start in" folder). Each platform has a proper API for "where am I".
+    inline const std::filesystem::path& executableDir()
+    {
+        static const std::filesystem::path dir = []() -> std::filesystem::path
+        {
+#if defined(_WIN32)
+            char buffer[MAX_PATH];
+            DWORD len = GetModuleFileNameA(nullptr, buffer, MAX_PATH);
+            if (len > 0 && len < MAX_PATH)
+                return std::filesystem::path(buffer).parent_path();
+#elif defined(__APPLE__)
+            char buffer[PATH_MAX];
+            uint32_t size = sizeof(buffer);
+            if (_NSGetExecutablePath(buffer, &size) == 0)
+                return std::filesystem::canonical(buffer).parent_path();
+#else
+            char buffer[PATH_MAX];
+            ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+            if (len != -1)
+            {
+                buffer[len] = '\0';
+                return std::filesystem::path(buffer).parent_path();
+            }
+#endif
+            // Only reached if the platform call above failed.
+            return std::filesystem::current_path();
+        }();
+        return dir;
+    }
+
+    // Path helpers: the single place that knows the on-disk layout.
+    // Everything is resolved as <executableDir>/assets/...
+    inline std::string texturePath(const std::string& file)
+    {
+        return (executableDir() / "assets" / "textures" / file).string();
+    }
+
+    inline std::string assetPath(const std::string& file)
+    {
+        // Resolve asset paths relative to the executable.
+        std::string relative = file;
+        if (!relative.empty() && relative.front() == '/')
+            relative.erase(relative.begin());
+        return (executableDir() / "assets" / relative).string();
+    }
+
+    // Resolve save/settings paths relative to the executable.
+    inline std::string savePath(const std::string& file)
+    {
+        return (executableDir() / file).string();
     }
 }

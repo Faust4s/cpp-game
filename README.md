@@ -36,13 +36,14 @@ Step on buttons to activate button-controlled platforms. Touching the wrong haza
 | Pause | `Esc` |
 
 
-## Building from source
+## Building from source & running
  
 ```bash
 git clone <repo-url>
 cd 2Dgame
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
+cd build && make run
 ```
  
 Levels are plain text grids (`assets/mapN.txt`); each character maps to a tile, hazard, gem, door,

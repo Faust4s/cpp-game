@@ -525,7 +525,7 @@ void Game::loadMap(const std::string &name)
     gems.clear();
     buttons.clear();
 
-    std::ifstream in(std::string(GAME_ASSET_DIR) + "/" + name);
+    std::ifstream in(Assets::assetPath(name));
     if (!in)
         return;
 

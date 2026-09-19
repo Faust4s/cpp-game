@@ -4,14 +4,14 @@
 
 void SaveManager::save(int unlockedLevels)
 {
-    std::ofstream out(Assets::SaveFiles::SAVE, std::ios::binary);
+    std::ofstream out(Assets::savePath(Assets::SaveFiles::SAVE), std::ios::binary);
     if (out)
         out.write(reinterpret_cast<const char*>(&unlockedLevels), sizeof(int));
 }
 
 int SaveManager::load()
 {
-    std::ifstream in(Assets::SaveFiles::SAVE, std::ios::binary);
+    std::ifstream in(Assets::savePath(Assets::SaveFiles::SAVE), std::ios::binary);
     if (!in)
         return 1; // default - level 1 is unlocked
 

@@ -4,7 +4,7 @@
 
 void SettingsManager::save(bool musicMuted, bool soundMuted)
 {
-    std::ofstream out(Assets::SaveFiles::SETTINGS, std::ios::binary);
+    std::ofstream out(Assets::savePath(Assets::SaveFiles::SETTINGS), std::ios::binary);
     if (out)
     {
         out.write(reinterpret_cast<const char*>(&musicMuted), sizeof(bool));
@@ -17,7 +17,7 @@ void SettingsManager::load(bool &musicMuted, bool &soundMuted)
     musicMuted = false;
     soundMuted = false;
 
-    std::ifstream in(Assets::SaveFiles::SETTINGS, std::ios::binary);
+    std::ifstream in(Assets::savePath(Assets::SaveFiles::SETTINGS), std::ios::binary);
     if (!in)
         return;
 
