@@ -5,18 +5,18 @@ on: [push, pull_request]
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install build tools
-        run: sudo apt-get update && sudo apt-get install -y zip
-
-      - name: Install SFML (vcpkg, static)
-        run: vcpkg install sfml:x64-linux
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake libsfml-dev zip
 
       - name: CMake configure
-        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: cmake --build build --parallel
@@ -25,7 +25,9 @@ jobs:
         run: cmake --install build --prefix out/2DGame
 
       - name: Zip
-        run: cd out && zip -r ../2DGame-linux.zip 2DGame
+        run: |
+          cd out
+          zip -r ../2DGame-linux.zip 2DGame
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -35,12 +37,22 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install SFML (vcpkg)
-        run: vcpkg install sfml:x64-windows
+      - name: Pin SFML to 2.x via a vcpkg manifest
+        shell: pwsh
+        run: |
+          $baseline = (git -C C:\vcpkg rev-parse HEAD).Trim()
+          @{
+              name              = "2dgame"
+              version           = "1.0.0"
+              "builtin-baseline" = $baseline
+              dependencies      = @("sfml")
+              overrides         = @(@{ name = "sfml"; version = "2.6.1" })
+          } | ConvertTo-Json -Depth 5 | Set-Content -Path vcpkg.json
 
       - name: CMake configure
         run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -62,15 +74,18 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install SFML (vcpkg, static)
-        run: vcpkg install sfml:arm64-osx
+      - name: Install dependencies
+        run: brew install sfml@2
 
       - name: CMake configure
-        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=arm64-osx
+        run: |
+          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH=$(brew --prefix sfml@2)
 
       - name: Build
         run: cmake --build build --parallel
@@ -79,7 +94,9 @@ jobs:
         run: cmake --install build --prefix out/2DGame
 
       - name: Zip
-        run: cd out && zip -r ../2DGame-macos.zip 2DGame
+        run: |
+          cd out
+          zip -r ../2DGame-macos.zip 2DGame
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -93,6 +110,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
+
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
