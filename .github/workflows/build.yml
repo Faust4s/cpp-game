@@ -13,7 +13,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake libsfml-dev zip
+          sudo apt-get install -y cmake libsfml-dev zip patchelf
 
       - name: CMake configure
         run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
@@ -23,6 +23,28 @@ jobs:
 
       - name: Install (collect exe + assets into one folder)
         run: cmake --install build --prefix out/2DGame
+
+      - name: Bundle shared libraries
+        run: |
+          DIR=out/2DGame
+          EXE="$DIR/game"
+          [ -f "$EXE" ] || { echo "Missing $EXE"; ls -R "$DIR"; exit 1; }
+          mkdir -p "$DIR/lib"
+          ldd "$EXE" | awk '/=> \//{print $3}' | while read -r lib; do
+            case "$(basename "$lib")" in
+              # provided by every desktop Linux system
+              ld-linux*|libc.so*|libm.so*|libdl.so*|libpthread.so*|librt.so*|libresolv.so*) ;;
+              libGL.so*|libGLX.so*|libGLdispatch.so*|libEGL.so*|libOpenGL.so*) ;;
+              libX*|libxcb*|libdrm*|libudev*|libasound*) ;;
+              *) cp -L "$lib" "$DIR/lib/" ;;
+            esac
+          done
+          patchelf --set-rpath '$ORIGIN/lib' "$EXE"
+          for f in "$DIR"/lib/*.so*; do patchelf --set-rpath '$ORIGIN' "$f"; done
+          ldd "$EXE" | grep sfml
+          if ldd "$EXE" | grep -q "not found"; then
+            echo "Unresolved libraries:"; ldd "$EXE"; exit 1
+          fi
 
       - name: Zip
         run: |
@@ -47,11 +69,11 @@ jobs:
         run: |
           $baseline = (git -C C:\vcpkg rev-parse HEAD).Trim()
           @{
-              name              = "2dgame"
-              version           = "1.0.0"
+              name               = "2dgame"
+              version            = "1.0.0"
               "builtin-baseline" = $baseline
-              dependencies      = @("sfml")
-              overrides         = @(@{ name = "sfml"; version = "2.6.1" })
+              dependencies       = @("sfml")
+              overrides          = @(@{ name = "sfml"; version = "2.6.1" })
           } | ConvertTo-Json -Depth 5 | Set-Content -Path vcpkg.json
 
       - name: CMake configure
@@ -80,7 +102,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: brew install sfml@2
+        run: brew install sfml@2 dylibbundler
 
       - name: CMake configure
         run: |
@@ -92,6 +114,23 @@ jobs:
 
       - name: Install (collect exe + assets into one folder)
         run: cmake --install build --prefix out/2DGame
+
+      - name: Bundle dylibs
+        run: |
+          DIR=out/2DGame
+          EXE="$DIR/game"
+          [ -f "$EXE" ] || { echo "Missing $EXE"; ls -R "$DIR"; exit 1; }
+          dylibbundler -od -b -cd \
+            -x "$EXE" \
+            -d "$DIR/libs/" \
+            -p @executable_path/libs/ \
+            -s "$(brew --prefix sfml@2)/lib"
+          codesign --force --sign - "$DIR"/libs/*.dylib
+          codesign --force --sign - "$EXE"
+          otool -L "$EXE"
+          if otool -L "$EXE" "$DIR"/libs/*.dylib | grep -E '/opt/homebrew|/usr/local/(opt|Cellar)'; then
+            echo "Homebrew paths still referenced"; exit 1
+          fi
 
       - name: Zip
         run: |
