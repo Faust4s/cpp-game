@@ -40,7 +40,7 @@ Step on buttons to activate button-controlled platforms. Touching the wrong haza
  
 ```bash
 git clone <repo-url>
-cd 2Dgame
+cd cpp-game
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 cd build && make run
