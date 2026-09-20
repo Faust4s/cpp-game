@@ -17,10 +17,6 @@
  * bare (no directory prefix); use the path helpers at the bottom of this
  * file to turn one into something loadable. Nobody should be concatenating
  * a path by hand.
- *
- * Asset locations are resolved at RUNTIME relative to the executable's own
- * directory (see executableDir() below), not baked in at compile time.
- * This is what makes an installed/zipped build portable.
 */ 
 
 namespace Assets
